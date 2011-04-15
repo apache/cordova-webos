@@ -318,48 +318,6 @@ Camera.prototype.getPicture = function(successCallback, errorCallback, options) 
 	});	
 };
 
-/*
- * @param {Function} successCallback
- * @param {Function} errorCallback
- * @param {Object} options
- */
-/*
-Camera.prototype.getPicture = function(successCallback, errorCallback, options) {
-  params = { sublaunch: true };
-  
-  if (typeof options != 'undefined' && typeof options.filename != 'undefined') {
-    params.filename = options.filename;
-  }
-  
-  navigator.camera.errorCallback = errorCallback;
-  navigator.camera.successCallback = successCallback;
-  
-	//TODO: This callback is not being called
-	//currently calling handlePicture from First-assistant.js activate method
-	var that = this;
-	this.callback = function (event) { 
-		if (event !== undefined) {
-			debug.log(Object.toJSON(event));
-			//Mojo.Event.stopListening(PhoneGap.sceneController.sceneElement, Mojo.Event.activate, that.callback);
-			PhoneGap.sceneController.sceneElement.removeEventListener("activate", that.callback);
-			
-			// TODO: not receiving the proper event object as per forum article
-			//successCallback(event.filename);
-		}
-	};
-	
-	//Mojo.Event.listen(PhoneGap.sceneController.sceneElement, Mojo.Event.activate, this.callback);
-	PhoneGap.sceneController.sceneElement.addEventListener("activate", this.callback);
-	
-	PhoneGap.sceneController.stageController.pushScene(
-		{ 
-			appId :'com.palm.app.camera', 
-			name: 'capture'
-		}, params
-	);
-};
-*/
-
 if (typeof navigator.camera == 'undefined') navigator.camera = new Camera();
 
 /*
@@ -423,13 +381,9 @@ function DebugConsole() {
  */
 DebugConsole.prototype.log = function(message) {
 	if (typeof message == 'object')
-		message = Object.toJSON(message);
+		message = Object.toJSON(message);   
+		
 	this.error(message);
-	//this isn't working on the device
-	/*
-    if (typeof Mojo != 'undefined')
-		Mojo.Log.info(message);
-	*/
 };
 
 /*
@@ -438,13 +392,9 @@ DebugConsole.prototype.log = function(message) {
  */
 DebugConsole.prototype.warn = function(message) {
 	if (typeof message == 'object')
-		message = Object.toJSON(message);
+		message = Object.toJSON(message);    
+		
 	this.error(message);
-	//this isn't working on the device
-	/*
-    if (typeof Mojo != 'undefined')
-		Mojo.Log.warn(message);
-	*/
 };
 
 /**
@@ -454,10 +404,8 @@ DebugConsole.prototype.warn = function(message) {
 DebugConsole.prototype.error = function(message) {
 	if (typeof message == 'object')
 		message = Object.toJSON(message);
-    //if (typeof Mojo != 'undefined')
-	//	Mojo.Log.error(message);
-	//console.log(JSON.stringify(message));
-	console.log(message);
+ 
+	console.log(JSON.stringify(message));
 };
 
 if (typeof window.debug == "undefined") window.debug = new DebugConsole();
@@ -471,10 +419,6 @@ function Device() {
     this.version  = null;
     this.name     = null;
     this.uuid     = null;
-
-	// moved into deviceReady method...
-	//if (typeof Mojo != 'undefined')
-	//	this.setUUID();
 };
 
 /*
@@ -488,6 +432,7 @@ Device.prototype.getDeviceInfo = function() {
 
 /*
  * needs to be invoked in a <script> nested within the <body> it tells WebOS that the app is ready
+        TODO: see if we can get this added as in a document.write so that the user doesn't have to explicitly call this method
  * Dependencies: Mojo.onKeyUp
  * Example:
  *		navigator.device.deviceReady();
@@ -509,7 +454,6 @@ Device.prototype.deviceReady = function() {
 Device.prototype.setUUID = function() {
 	//this is the only system property webos provides (may change?)
 	var that = this;
-	//this.service = new Mojo.Service.Request('palm://com.palm.preferences/systemProperties', {
 	this.service = navigator.service.Request('palm://com.palm.preferences/systemProperties', {
 	    method:"Get",
 	    parameters:{"key": "com.palm.properties.nduid" },
@@ -582,7 +526,6 @@ File.prototype.write = function(file) {
 
 if (typeof navigator.file == "undefined") navigator.file = new File();
 
-
 /*
  * This class provides access to device GPS data.
  * @constructor
@@ -595,7 +538,7 @@ function Geolocation() {
     this.lastError = null;
     this.callbacks = {
         onLocationChanged: [],
-        onError:           []
+        onError: []
     };
 };
 
@@ -616,17 +559,17 @@ Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallba
     else
         this.start(options);
 	*/
-	
+
     var timeout = 20000;
-	if (typeof(options) == 'object' && options.timeout)
-		timeout = options.timeout;
+    if (typeof(options) == 'object' && options.timeout)
+    timeout = options.timeout;
 
     if (typeof(successCallback) != 'function')
-        successCallback = function() {};
+    successCallback = function() {};
     if (typeof(errorCallback) != 'function')
-        errorCallback = function() {};
+    errorCallback = function() {};
 
-	/*
+    /*
     var dis = this;
     var delay = 0;
     var timer = setInterval(function() {
@@ -643,56 +586,59 @@ Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallba
 		//else the interval gets called again
     }, interval);
 	*/
-	
-	var responseTime;
-	if (timeout <=5000)
-		responseTime = 1;
-	else if (5000 < timeout <= 20000)
-		responseTime = 2;
-	else
-		responseTime = 3;
-	
-	var timer = setTimeout(function(){
-		errorCallback({ message: "timeout" });
-	}, timeout);
-	
-	var startTime = (new Date()).getTime();
 
-	var alias = this;
-	
-	// It may be that getCurrentPosition is less reliable than startTracking ... but
-	// not sure if we want to be starting and stopping the tracker if we're not watching.
-	//new Mojo.Service.Request('palm://com.palm.location', {
-	navigator.service.Request('palm://com.palm.location', {
-	    method:"getCurrentPosition",
-	    parameters:{
-			responseTime: responseTime
-		},
-        onSuccess: function(event) { 
-			alias.lastPosition = { 
-				coords: { 
-					latitude: event.latitude, 
-					longitude: event.longitude, 
-					altitude: (event.altitude >= 0 ? event.altitude : null), 
-					speed: (event.velocity >= 0 ? event.velocity : null), 
-					heading: (event.heading >= 0 ? event.heading : null), 
-					accuracy: (event.horizAccuracy >= 0 ? event.horizAccuracy : null),
-					altitudeAccuracy: (event.vertAccuracy >= 0 ? event.vertAccuracy : null)
-				},
-				timestamp: new Date().getTime()
-			};
-			
-			var responseTime = alias.lastPosition.timestamp - startTime;
-			if (responseTime <= timeout)
-			{
-				clearTimeout(timer);
-				successCallback(alias.lastPosition);
-			}
-		},
+    var responseTime;
+    if (timeout <= 5000)
+    responseTime = 1;
+    else if (5000 < timeout <= 20000)
+    responseTime = 2;
+    else
+    responseTime = 3;
+
+    var timer = setTimeout(function() {
+        errorCallback({
+            message: "timeout"
+        });
+    },
+    timeout);
+
+    var startTime = (new Date()).getTime();
+
+    var alias = this;
+
+    // It may be that getCurrentPosition is less reliable than startTracking ... but
+    // not sure if we want to be starting and stopping the tracker if we're not watching.
+    //new Mojo.Service.Request('palm://com.palm.location', {
+    navigator.service.Request('palm://com.palm.location', {
+        method: "getCurrentPosition",
+        parameters: {
+            responseTime: responseTime
+        },
+        onSuccess: function(event) {
+            alias.lastPosition = {
+                coords: {
+                    latitude: event.latitude,
+                    longitude: event.longitude,
+                    altitude: (event.altitude >= 0 ? event.altitude: null),
+                    speed: (event.velocity >= 0 ? event.velocity: null),
+                    heading: (event.heading >= 0 ? event.heading: null),
+                    accuracy: (event.horizAccuracy >= 0 ? event.horizAccuracy: null),
+                    altitudeAccuracy: (event.vertAccuracy >= 0 ? event.vertAccuracy: null)
+                },
+                timestamp: new Date().getTime()
+            };
+
+            var responseTime = alias.lastPosition.timestamp - startTime;
+            if (responseTime <= timeout)
+            {
+                clearTimeout(timer);
+                successCallback(alias.lastPosition);
+            }
+        },
         onFailure: function() {
-			errorCallback();
-		}
-	});
+            errorCallback();
+        }
+    });
 
 };
 
@@ -706,28 +652,28 @@ Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallba
  * such as timeout and the frequency of the watch.
  */
 Geolocation.prototype.watchPosition = function(successCallback, errorCallback, options) {
-	// Invoke the appropriate callback with a new Position object every time the implementation 
-	// determines that the position of the hosting device has changed. 
-	
-	var frequency = 10000;
+    // Invoke the appropriate callback with a new Position object every time the implementation
+    // determines that the position of the hosting device has changed.
+    var frequency = 10000;
     if (typeof(options) == 'object' && options.frequency)
-        frequency = options.frequency;
+    frequency = options.frequency;
 
-	this.start(options, errorCallback);
-	
-	var referenceTime = 0;
-	if (this.lastPosition)
-		referenceTime = this.lastPosition.timestamp;
-		
-	var alias = this;
-	return setInterval(function() {
-		// check if we have a new position, if so call our successcallback
-		if (!alias.lastPosition)
-			return;
-	
-		if (alias.lastPosition.timestamp > referenceTime)
-			successCallback(alias.lastPosition);
-	}, frequency);
+    this.start(options, errorCallback);
+
+    var referenceTime = 0;
+    if (this.lastPosition)
+    referenceTime = this.lastPosition.timestamp;
+
+    var alias = this;
+    return setInterval(function() {
+        // check if we have a new position, if so call our successcallback
+        if (!alias.lastPosition)
+        return;
+
+        if (alias.lastPosition.timestamp > referenceTime)
+        successCallback(alias.lastPosition);
+    },
+    frequency);
 };
 
 
@@ -736,59 +682,57 @@ Geolocation.prototype.watchPosition = function(successCallback, errorCallback, o
  * @param {String} watchId The ID of the watch returned from #watchPosition.
  */
 Geolocation.prototype.clearWatch = function(watchId) {
-	clearInterval(watchId);
-	this.stop();
+    clearInterval(watchId);
+    this.stop();
 };
 
 Geolocation.prototype.start = function(options, errorCallback) {
-	//options.timeout;
-	//options.interval;
-	
-	if (typeof(errorCallback) != 'function')
-		errorCallback = function(){};
-	
-	var that = this;
-	var frequency = 10000;
-    if (typeof(options) == 'object' && options.frequency)
-        frequency = options.frequency;
+    //options.timeout;
+    //options.interval;
+    if (typeof(errorCallback) != 'function')
+    errorCallback = function() {};
 
-	var responseTime;
-	if (frequency <=5000)
-		responseTime = 1;
-	else if (5000 < frequency <= 20000)
-		responseTime = 2;
-	else
-		responseTime = 3;
-	
-	//location tracking does not support setting a custom interval :P
-	//this.trackingHandle = new Mojo.Service.Request('palm://com.palm.location', {
-		this.trackingHandle = navigator.service.Request('palm://com.palm.location', {
-		method : 'startTracking',
+    var that = this;
+    var frequency = 10000;
+    if (typeof(options) == 'object' && options.frequency)
+    frequency = options.frequency;
+
+    var responseTime;
+    if (frequency <= 5000)
+    responseTime = 1;
+    else if (5000 < frequency <= 20000)
+    responseTime = 2;
+    else
+    responseTime = 3;
+
+    //location tracking does not support setting a custom interval :P
+    this.trackingHandle = navigator.service.Request('palm://com.palm.location', {
+        method: 'startTracking',
         parameters: {
-			subscribe: true
+            subscribe: true
         },
-        onSuccess: function(event) { 
-			that.lastPosition = { 
-				coords: { 
-					latitude: event.latitude, 
-					longitude: event.longitude, 
-					altitude: (event.altitude >= 0 ? event.altitude : null), 
-					speed: (event.velocity >= 0 ? event.velocity : null), 
-					heading: (event.heading >= 0 ? event.heading : null), 
-					accuracy: (event.horizAccuracy >= 0 ? event.horizAccuracy : null),
-					altitudeAccuracy: (event.vertAccuracy >= 0 ? event.vertAccuracy : null)
-				}, 
-				timestamp: new Date().getTime() 
-			};
-		},
+        onSuccess: function(event) {
+            that.lastPosition = {
+                coords: {
+                    latitude: event.latitude,
+                    longitude: event.longitude,
+                    altitude: (event.altitude >= 0 ? event.altitude: null),
+                    speed: (event.velocity >= 0 ? event.velocity: null),
+                    heading: (event.heading >= 0 ? event.heading: null),
+                    accuracy: (event.horizAccuracy >= 0 ? event.horizAccuracy: null),
+                    altitudeAccuracy: (event.vertAccuracy >= 0 ? event.vertAccuracy: null)
+                },
+                timestamp: new Date().getTime()
+            };
+        },
         onFailure: function() {
-			errorCallback();
-		}
+            errorCallback();
+        }
     });
 };
 
 Geolocation.prototype.stop = function() {
-	this.trackingHandle.cancel();
+    this.trackingHandle.cancel();
 };
 
 if (typeof navigator.geolocation == "undefined") navigator.geolocation = new Geolocation();
@@ -929,7 +873,6 @@ function Network() {
 };
 
 Network.prototype.isReachable = function(hostName, successCallback, options) {
-	//this.request = new Mojo.Service.Request('palm://com.palm.connectionmanager', {
 	this.request = navigator.service.Request('palm://com.palm.connectionmanager', {
 	    method: 'getstatus',
 	    parameters: {},
@@ -966,7 +909,8 @@ if (typeof navigator.network == "undefined") navigator.network = new Network();
  * This class provides access to notifications on the device.
  */
 function Notification() {
-};
+
+    };
 
 /*
  * adds a dashboard to the WebOS app
@@ -974,28 +918,56 @@ function Notification() {
  * @param {String} html
  * Example:
  *		navigator.notification.newDashboard("dashboard.html");
- */	
+ */
 Notification.prototype.newDashboard = function(url, html) {
-	var win = window.open(url, "_blank", "attributes={\"window\":\"dashboard\"}");
-	html && win.document.write(html);
-	win.PalmSystem.stageReady();
+    var win = window.open(url, "_blank", "attributes={\"window\":\"dashboard\"}");
+    html && win.document.write(html);
+    win.PalmSystem.stageReady();
 };
 
 /*
  * Displays a banner notification. If specified, will send your 'response' object as data via the 'palmsystem' DOM event.
  * If no 'icon' filename is specified, will use a small version of your application icon.
  * @param {String} message
- * @param {String} response
- * @param {String} icon
+ * @param {Object} response
+ * @param {String} icon 
+ * @param {String} soundClass class of the sound; supported classes are: "ringtones", "alerts", "alarm", "calendar", "notification"
+ * @param {String} soundFile partial or full path to the sound file
+ * @param {String} soundDurationMs of sound in ms
  * Example:
- *		navigator.notification.showBanner();
+ *		navigator.notification.showBanner('test message');
  */
-Notification.prototype.showBanner = function(message, response, icon) {
-	var response = response || { banner: true };
-	
-	// the extra parameters in this are soundClass, soundFile,
-	// soundDruation respectively. Not going down that path just yet
-	PalmSystem.addBannerMessage(message, JSON.stringify(response), icon || "", "", "", "");
+Notification.prototype.showBanner = function(message, response, icon, soundClass, soundFile, soundDurationMs) {
+    var response = response || {
+        banner: true
+    };
+    PalmSystem.addBannerMessage(message, JSON.stringify(response), icon, soundClass, soundFile, soundDurationMs);
+};
+
+/**
+ * Remove a banner from the banner area. The category parameter defaults to 'banner'. Will not remove
+ * messages that are already displayed.
+ * @param {String} category 
+		Value defined by the application and usually same one used in {@link showBanner}. 
+		It is used if you have more than one kind of banner message. 
+ */
+Notification.prototype.removeBannerMessage = function(category) {
+    var bannerKey = category || 'banner';
+    var bannerId = this.banners.get(bannerKey);
+    if (bannerId) {
+        try {
+            PalmSystem.removeBannerMessage(bannerId);
+        } catch(removeBannerException) {
+            window.debug.error(removeBannerException.toString());
+        }
+    }
+};
+
+/*
+ * Remove all pending banner messages from the banner area. Will not remove messages that are already displayed.
+ */
+Notification.prototype.clearBannerMessage = function() {
+    PalmSystem.clearBannerMessage();
 };
 
 /*
@@ -1003,68 +975,52 @@ Notification.prototype.showBanner = function(message, response, icon) {
  * @param {number} duration The duration in ms to vibrate for.
  * @param {number} intensity The intensity of the vibration
  */
-Notification.prototype.vibrate = function (duration, intensity) {
-	//the intensity for palm is inverted; 0=high intensity, 100=low intensity
-	//this is opposite from our api, so we invert
-	if (isNaN(intensity) || intensity > 100 || intensity <= 0)
-		intensity = 0;
-	else
-		intensity = 100 - intensity;
-	
-	// if the app id does not have the namespace "com.palm.", an error will be thrown here
-	//this.vibhandle = new Mojo.Service.Request("palm://com.palm.vibrate", { 
-	this.vibhandle = navigator.service.Request("palm://com.palm.vibrate", { 
-		method: 'vibrate', 
-		parameters: { 
-			'period': intensity,
-			'duration': duration
-		}
-	}, false);
+Notification.prototype.vibrate = function(duration, intensity) {
+    //the intensity for palm is inverted; 0=high intensity, 100=low intensity
+    //this is opposite from our api, so we invert
+    if (isNaN(intensity) || intensity > 100 || intensity <= 0)
+    intensity = 0;
+    else
+    intensity = 100 - intensity;
+
+    // if the app id does not have the namespace "com.palm.", an error will be thrown here
+    //this.vibhandle = new Mojo.Service.Request("palm://com.palm.vibrate", {
+    this.vibhandle = navigator.service.Request("palm://com.palm.vibrate", {
+        method: 'vibrate',
+        parameters: {
+            'period': intensity,
+            'duration': duration
+        }
+    },
+    false);
 };
 
-Notification.prototype.beep = function () {
-	//this.beephandle = new Mojo.Service.Request('palm://com.palm.audio/systemsounds', {
-	this.beephandle = navigator.service.Request('palm://com.palm.audio/systemsounds', {
-	    method: "playFeedback",
-	    parameters: {
-			// There isn't really a generic 'beep' in the system sounds.
-			// http://developer.palm.com/index.php?option=com_content&view=article&id=1618
-			name: "error_01"
-		},
-    	onSuccess: function (response) { },
-    	//onFailure: function (response) { Mojo.Log.error("failure: " + Object.toJSON(response)); }
-		onFailure: function (response) { window.debug.error("failure: " + Object.toJSON(response)); }
-	}, true);
+/* 
+ * Plays the specified sound
+ * @param {String} soundClass class of the sound; supported classes are: "ringtones", "alerts", "alarm", "calendar", "notification"
+ * @param {String} soundFile partial or full path to the sound file
+ * @param {String} soundDurationMs of sound in ms
+ */
+Notification.prototype.beep = function(soundClass, soundFile, soundDurationMs) {
+    PalmSystem.playSoundNotification(soundClass, soundFile, soundDurationMs);
 };
 
 /*
- * Open a native alert dialog, with a customizable title and button text.
- * @param {String} message Message to print in the body of the alert
- * @param {String} [title="Alert"] Title of the alert dialog (default: Alert)
- * @param {String} [buttonLabel="OK"] Label of the close button (default: OK)
+ * displays a notification
+ * @param {String} message
+ * @param {Object} response
+ * @param {String} icon
  */
-Notification.prototype.alert = function(message, title, buttonLabel) {
-	try {
-		//var controller = Mojo.Controller.getAppController().getActiveStageController().
-		//debug.log(Object.toJSON(Mojo.Controller.getAppController()));
-	if (typeof title == 'undefined')
-		title = Mojo.appInfo.title;
-	if (typeof buttonLabel == 'undefined')
-		buttonLabel = "OK";
-	PhoneGap.sceneController.showAlertDialog({
-	    onChoose: function() {},
-	    title: $L(title),
-	    message: $L(message),
-	    choices:[
-	         {label:(buttonLabel), value:"true", type:'affirmative'}   
-	    ]
-	    });
-	} catch (ex) { debug.log(ex.name + ": " + ex.message); }
+Notification.prototype.alert = function(message, response, icon) {
+    var response = response || {
+        banner: true
+    };
+    navigator.notification.showBanner(message, response, icon);
 };
 
-if (typeof navigator.notification == 'undefined') { 
-	navigator.notification = new Notification(); 
-	alert = navigator.notification.alert;
+if (typeof navigator.notification == 'undefined') {
+    navigator.notification = new Notification();
+    alert = navigator.notification.alert;
 }
 
 /*
@@ -1072,10 +1028,6 @@ if (typeof navigator.notification == 'undefined') {
  * @constructor
  */
 function Orientation() {
-	/*
-	 * The current orientation, or null if the orientation hasn't changed yet.
-	 */
-	this.currentOrientation = null;
 	this.started = false;
 };
 
@@ -1088,68 +1040,30 @@ function Orientation() {
  *		navigator.orientation.setOrientation('up');
  */
 Orientation.prototype.setOrientation = function(orientation) {
-	PalmSystem.setWindowOrientation(orientation || 'free');
+	PalmSystem.setWindowOrientation(orientation);   
 };
 
 /*
- * Set the current orientation of the phone.  This is called from the device automatically.
- * 
- * When the orientation is changed, the DOMEvent \c orientationChanged is dispatched against
- * the document element.  The event has the property \c orientation which can be used to retrieve
- * the device's current orientation, in addition to the \c Orientation.currentOrientation class property.
- *
- * @param {Number} orientation The orientation to be set
+ * Returns the current window orientation
  */
-/*
-Orientation.prototype.setOrientation = function(orientation) {
-	if (!isNaN(orientation) && this.currentOrientation != orientation) {
-	    this.currentOrientation = orientation;
-	    var e = document.createEvent('Events');
-	    e.initEvent('orientationChanged', 'false', 'false');
-	    e.orientation = orientation;
-	    document.dispatchEvent(e);
-	}
-};
-*/
-
-/*
- * Asynchronously aquires the current orientation.
- * @param {Function} successCallback The function to call when the orientation
- * is known.
- * @param {Function} errorCallback The function to call when there is an error 
- * getting the orientation.
- */
-Orientation.prototype.getCurrentOrientation = function(successCallback, errorCallback) {
-	if (typeof successCallback != 'function')
-		successCallback = function () {};
-	if (typeof errorCallback != 'function')
-		errorCallback = function () {};
-	
-	if (!this.started)
-		this.start(successCallback);
-	else if (!isNaN(this.currentOrientation))
-		successCallback(this.currentOrientation);
-	else
-		errorCallback();
+Orientation.prototype.getCurrentOrientation = function() {
+  	return PalmSystem.windowOrientation;
 };
 
 /*
  * Starts the native orientationchange event listener.
- */
+ */  
 Orientation.prototype.start = function (successCallback) {
 	var that = this;
 	// This subscribes the callback once for the successCallback function
 	that.callback = function (e) {
-		//Mojo.Event.stopListening(document, "orientationChanged", that.callback);
 		document.removeEventListener("orientationChanged", that.callback);
 		successCallback(e.orientation);
 	}
 	
-	//Mojo.Event.listen(document, "orientationChanged", that.callback);
 	document.addEventListener("orientationChanged", that.callback);
 	
 	// This subscribes setOrientation to be constantly updating the currentOrientation property
-	//Mojo.Event.listen(document, "orientationchange", function(event) {
 	document.addEventListener("orientationchange", function(event) {
 		var orient = null;
 		switch (event.position) {
@@ -1172,7 +1086,7 @@ Orientation.prototype.start = function (successCallback) {
  * data is available.
  * @param {Function} errorCallback The function to call when there is an error 
  * getting the orientation data.
- */
+ */             
 Orientation.prototype.watchOrientation = function(successCallback, errorCallback, options) {
 	// Invoke the appropriate callback with a new Position object every time the implementation 
 	// determines that the position of the hosting device has changed. 
@@ -1185,19 +1099,19 @@ Orientation.prototype.watchOrientation = function(successCallback, errorCallback
 		that.getCurrentOrientation(successCallback, errorCallback);
 	}, interval);
 };
-
+       
 /*
  * Clears the specified orientation watch.
  * @param {String} watchId The ID of the watch returned from #watchOrientation.
- */
+ */     
 Orientation.prototype.clearWatch = function(watchId) {
 	clearInterval(watchId);
 };
-
+  
 /*
  * This class encapsulates the possible orientation values.
  * @constructor
- */
+ */  
 function DisplayOrientation() {
 	this.code = null;
 	this.message = "";
@@ -1337,7 +1251,7 @@ if (typeof navigator.service == "undefined") navigator.service = new Service();
  */
 function Sms() {
 
-};
+    };
 
 /*
  * Sends an SMS message.
@@ -1348,22 +1262,24 @@ function Sms() {
  * @param {PositionOptions} options The options for accessing the GPS location such as timeout and accuracy.
  */
 Sms.prototype.send = function(number, message, successCallback, errorCallback, options) {
-	try {
-		//this.service = new Mojo.Service.Request('palm://com.palm.applicationManager', {
-		this.service = navigator.service.Request('palm://com.palm.applicationManager', {
-		     method:'launch',
-		     parameters:{
-		         id:"com.palm.app.messaging",
-		         params: {
-					composeAddress: number,
-					messageText: message
-		         }
-		     }
-		});
-		successCallback();
-	} catch (ex) {
-		errorCallback({ name: "SMSerror", message: ex.name + ": " + ex.message });
-	}
+    try {
+        this.service = navigator.service.Request('palm://com.palm.applicationManager', {
+            method: 'launch',
+            parameters: {
+                id: "com.palm.app.messaging",
+                params: {
+                    composeAddress: number,
+                    messageText: message
+                }
+            }
+        });
+        successCallback();
+    } catch(ex) {
+        errorCallback({
+            name: "SMSerror",
+            message: ex.name + ": " + ex.message
+        });
+    }
 };
 
 if (typeof navigator.sms == "undefined") navigator.sms = new Sms();
@@ -1374,95 +1290,105 @@ if (typeof navigator.sms == "undefined") navigator.sms = new Sms();
  */
 
 function Storage() {
-	this.length = null;
-	this.available = true;
-	this.serialized = null;
-	this.items = null;
-	
-	if (!window.widget) {
-		this.available = false;
-		return;
-	}
-	var pref = window.widget.preferenceForKey(Storage.PREFERENCE_KEY);
-	
-	//storage not yet created
-	if (pref == "undefined" || pref == undefined) {
-		this.length = 0;
-		this.serialized = "({})";
-		this.items = {};
-		window.widget.setPreferenceForKey(this.serialized, Storage.PREFERENCE_KEY);
-	} else {
-		this.serialized = pref;'({"store_test": { "key": "store_test", "data": "asdfasdfs" },})';
+    this.length = null;
+    this.available = true;
+    this.serialized = null;
+    this.items = null;
 
-		this.items = eval(this.serialized);
+    if (!window.widget) {
+        this.available = false;
+        return;
+    }
+    var pref = window.widget.preferenceForKey(Storage.PREFERENCE_KEY);
 
-	}
+    //storage not yet created
+    if (pref == "undefined" || pref == undefined) {
+        this.length = 0;
+        this.serialized = "({})";
+        this.items = {};
+        window.widget.setPreferenceForKey(this.serialized, Storage.PREFERENCE_KEY);
+    } else {
+        this.serialized = pref;
+        '({"store_test": { "key": "store_test", "data": "asdfasdfs" },})';
+
+        this.items = eval(this.serialized);
+
+    }
 };
 
 Storage.PREFERENCE_KEY = "phonegap_storage_pref_key";
 
-Storage.prototype.index = function (key) {
-	
+Storage.prototype.index = function(key) {
+
+    };
+
+Storage.prototype.getItem = function(key) {
+
+    var err = "Storage unimplemented on Palm PhoneGap";
+    debug.log(err);
+    throw {
+        name: "StorageError",
+        message: err
+    };
+
+    try {
+        return this.items[key].data;
+    } catch(ex) {
+        return null;
+    }
 };
 
-Storage.prototype.getItem = function (key) {
-	
-	var err = "Storage unimplemented on Palm PhoneGap";
-	debug.log(err);
-	throw { name: "StorageError", message: err };
-	
-	try {
-		return this.items[key].data;
-	} catch (ex) {
-		return null;
-	}
+Storage.prototype.setItem = function(key, data) {
+
+    var err = "Storage unimplemented on Palm PhoneGap";
+    debug.log(err);
+    throw {
+        name: "StorageError",
+        message: err
+    };
+
+    if (!this.items[key])
+    this.length++;
+    this.items[key] = {
+        "key": key,
+        "data": data
+    };
+
+    this.serialize();
 };
 
-Storage.prototype.setItem = function (key, data) {
-	
-	var err = "Storage unimplemented on Palm PhoneGap";
-	debug.log(err);
-	throw { name: "StorageError", message: err };
-	
-	if (!this.items[key])
-		this.length++;
-	this.items[key] = {
-		"key": key,
-		"data": data
-	};
-	
-	this.serialize();
+Storage.prototype.removeItem = function(key) {
+    if (this.items[key]) {
+        this.items[key] = undefined;
+        this.length--;
+    }
+    this.serialize();
 };
 
-Storage.prototype.removeItem = function (key) {
-	if (this.items[key]) {
-		this.items[key] = undefined;
-		this.length--;
-	}
-	this.serialize();
-};
-
-Storage.prototype.clear = function () {
-	this.length = 0;
-	this.serialized = "({})";
-	this.items = {};
+Storage.prototype.clear = function() {
+    this.length = 0;
+    this.serialized = "({})";
+    this.items = {};
 };
 
 Storage.prototype.serialize = function() {
-	var err = "Storage unimplemented on Palm PhoneGap";
-	debug.log(err);
-	throw { name: "StorageError", message: err };
+    var err = "Storage unimplemented on Palm PhoneGap";
+    debug.log(err);
+    throw {
+        name: "StorageError",
+        message: err
+    };
 
 };
 
-if (typeof navigator.storage == "undefined" ) navigator.storage = new Storage();
+if (typeof navigator.storage == "undefined") navigator.storage = new Storage();
 
 /*
  * This class provides access to the telephony features of the device.
  * @constructor
  */
 function Telephony() {
-	this.number = "";
+    this.number = "";
 };
 
 /*
@@ -1470,21 +1396,20 @@ function Telephony() {
  * @param {Integer} number The number to be called.
  */
 Telephony.prototype.send = function(number) {
-	this.number = number;
-	//this.service = new Mojo.Service.Request('palm://com.palm.applicationManager', {
-	this.service = navigator.service.Request('palm://com.palm.applicationManager', {
-	    method:'open',
-	    parameters: {
-	       target: "tel://" + number
-	    }
-	});
+    this.number = number;
+    this.service = navigator.service.Request('palm://com.palm.applicationManager', {
+        method: 'open',
+        parameters: {
+            target: "tel://" + number
+        }
+    });
 };
 
 if (typeof navigator.telephony == "undefined") navigator.telephony = new Telephony();
 
 function Window() {
 
-};
+    };
 
 /*
  * This is a thin wrapper for 'window.open()' which optionally sets document contents to 'html', and calls 'PalmSystem.stageReady()'
@@ -1493,12 +1418,12 @@ function Window() {
  * @param {String} html
  * Example:
  *		navigator.window.newCard('about:blank', '<html><body>Hello again!</body></html>');
- */		
+ */
 Window.prototype.newCard = function(url, html) {
-	var win = window.open(url || "");
-	if (html)
-		win.document.write(html);
-	win.PalmSystem.stageReady();
+    var win = window.open(url || "");
+    if (html)
+        win.document.write(html);
+    win.PalmSystem.stageReady();
 };
 
 /*
@@ -1508,8 +1433,8 @@ Window.prototype.newCard = function(url, html) {
  *		navigator.window.setFullScreen(true);
  */
 Window.prototype.setFullScreen = function(state) {
-	// valid state values are: true or false
-	PalmSystem.enableFullScreenMode(state);
+    // valid state values are: true or false
+    PalmSystem.enableFullScreenMode(state);
 };
 
 /*
@@ -1519,10 +1444,10 @@ Window.prototype.setFullScreen = function(state) {
  * 		private method used by other member functions - ideally we shouldn't call this method
  */
 Window.prototype.setWindowProperties = function(props) {
-	if (typeof props === 'object')
-		navigator.windowProperties = props;
-	
-	PalmSystem.setWindowProperties(props || this.windowProperties);
+    if (typeof props === 'object')
+        navigator.windowProperties = props;
+
+    PalmSystem.setWindowProperties(props || this.windowProperties);
 };
 
 /*
@@ -1532,8 +1457,8 @@ Window.prototype.setWindowProperties = function(props) {
  *		navigator.window.blockScreenTimeout(true);
  */
 Window.prototype.blockScreenTimeout = function(state) {
-	navigator.windowProperties.blockScreenTimeout = state;
-	this.setWindowProperties();
+    navigator.windowProperties.blockScreenTimeout = state;
+    this.setWindowProperties();
 };
 
 /*
@@ -1543,16 +1468,19 @@ Window.prototype.blockScreenTimeout = function(state) {
  *		navigator.window.setSubtleLightbar(true);
  */
 Window.prototype.setSubtleLightbar = function(state) {
-	navigator.windowProperties.setSubtleLightbar = state;
-	this.setWindowProperties();
+    navigator.windowProperties.setSubtleLightbar = state;
+    this.setWindowProperties();
 };
 
 if (typeof navigator.window == 'undefined') navigator.window = new Window();
 
+/*
+ * Object for storing WebOS window properties
+ */
 function WindowProperties() {
-	blockScreenTimeout = false;
-	setSubtleLightbar = false;
-	fastAccelerometer = false;
+    blockScreenTimeout = false;
+    setSubtleLightbar = false;
+    fastAccelerometer = false;
 };
 
 if (typeof navigator.windowProperties == 'undefined') navigator.windowProperties = new WindowProperties();

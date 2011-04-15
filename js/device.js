@@ -8,10 +8,6 @@ function Device() {
     this.version  = null;
     this.name     = null;
     this.uuid     = null;
-
-	// moved into deviceReady method...
-	//if (typeof Mojo != 'undefined')
-	//	this.setUUID();
 };
 
 /*
@@ -25,6 +21,7 @@ Device.prototype.getDeviceInfo = function() {
 
 /*
  * needs to be invoked in a <script> nested within the <body> it tells WebOS that the app is ready
+        TODO: see if we can get this added as in a document.write so that the user doesn't have to explicitly call this method
  * Dependencies: Mojo.onKeyUp
  * Example:
  *		navigator.device.deviceReady();
@@ -46,7 +43,6 @@ Device.prototype.deviceReady = function() {
 Device.prototype.setUUID = function() {
 	//this is the only system property webos provides (may change?)
 	var that = this;
-	//this.service = new Mojo.Service.Request('palm://com.palm.preferences/systemProperties', {
 	this.service = navigator.service.Request('palm://com.palm.preferences/systemProperties', {
 	    method:"Get",
 	    parameters:{"key": "com.palm.properties.nduid" },

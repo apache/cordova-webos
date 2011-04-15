@@ -1,6 +1,6 @@
 function Window() {
 
-};
+    };
 
 /*
  * This is a thin wrapper for 'window.open()' which optionally sets document contents to 'html', and calls 'PalmSystem.stageReady()'
@@ -9,12 +9,12 @@ function Window() {
  * @param {String} html
  * Example:
  *		navigator.window.newCard('about:blank', '<html><body>Hello again!</body></html>');
- */		
+ */
 Window.prototype.newCard = function(url, html) {
-	var win = window.open(url || "");
-	if (html)
-		win.document.write(html);
-	win.PalmSystem.stageReady();
+    var win = window.open(url || "");
+    if (html)
+        win.document.write(html);
+    win.PalmSystem.stageReady();
 };
 
 /*
@@ -24,8 +24,8 @@ Window.prototype.newCard = function(url, html) {
  *		navigator.window.setFullScreen(true);
  */
 Window.prototype.setFullScreen = function(state) {
-	// valid state values are: true or false
-	PalmSystem.enableFullScreenMode(state);
+    // valid state values are: true or false
+    PalmSystem.enableFullScreenMode(state);
 };
 
 /*
@@ -35,10 +35,10 @@ Window.prototype.setFullScreen = function(state) {
  * 		private method used by other member functions - ideally we shouldn't call this method
  */
 Window.prototype.setWindowProperties = function(props) {
-	if (typeof props === 'object')
-		navigator.windowProperties = props;
-	
-	PalmSystem.setWindowProperties(props || this.windowProperties);
+    if (typeof props === 'object')
+        navigator.windowProperties = props;
+
+    PalmSystem.setWindowProperties(props || this.windowProperties);
 };
 
 /*
@@ -48,8 +48,8 @@ Window.prototype.setWindowProperties = function(props) {
  *		navigator.window.blockScreenTimeout(true);
  */
 Window.prototype.blockScreenTimeout = function(state) {
-	navigator.windowProperties.blockScreenTimeout = state;
-	this.setWindowProperties();
+    navigator.windowProperties.blockScreenTimeout = state;
+    this.setWindowProperties();
 };
 
 /*
@@ -59,8 +59,8 @@ Window.prototype.blockScreenTimeout = function(state) {
  *		navigator.window.setSubtleLightbar(true);
  */
 Window.prototype.setSubtleLightbar = function(state) {
-	navigator.windowProperties.setSubtleLightbar = state;
-	this.setWindowProperties();
+    navigator.windowProperties.setSubtleLightbar = state;
+    this.setWindowProperties();
 };
 
 if (typeof navigator.window == 'undefined') navigator.window = new Window();
