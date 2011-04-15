@@ -29,7 +29,7 @@
 	<a onclick="page('screen');">Adjust Screen Settings</a>
 	<a onclick="info();">Show Device Info</a>
 	<a onclick="net();">Show Network Info</a>	
-	<a onclick="navigator.notification.showBanner('Banner test');menu(false);">Show Banner Message</a>
+	<a onclick="navigator.notification.showBanner('Banner test','banner');menu(false);">Show Banner Message</a>
 	<a onclick="window.debug.log('trace this');">Console Logging</a>
 	<a onclick="launchmap()">Launch Map App</a>
 	<a onclick="navigator.window.newCard('about:blank', '<html><body>Hello again!</body></html>');menu(false);">Launch New Card</a>
@@ -48,10 +48,13 @@
 	<input type="radio" onchange="navigator.orientation.setOrientation(this.value);" value="right" name="orientation">right
 	<input type="radio" onchange="navigator.orientation.setOrientation(this.value);" value="free" name="orientation">free
 
-	<!--
+	
+	<p>navigator.orientation.getCurrentOrientation()</p>
+	<input type="button" onclick="displayCurrentOrientation();" value="Get Current Orientation">  
+	
 	<p>navigator.notification.alert();</p>
-	<input type="button" onclick="displayAlert();" value="navigator.notification.alert();">
-	-->
+	<input type="button" onclick="navigator.notification.alert('alert');" value="Show Alert">      
+	
 	
 </div>
 
@@ -98,8 +101,8 @@ function net() {
 	var request = navigator.network.isReachable('palm://com.palm.connectionmanager', successful, {});
 }
 
-function displayAlert() {
-	navigator.notification.alert("message", "title", "label");
+function displayCurrentOrientation() {
+	navigator.notification.showBanner(navigator.orientation.getCurrentOrientation(), 'current orientaiton'); 
 }	
 
 function getPicture() {
