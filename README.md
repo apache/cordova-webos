@@ -1,6 +1,6 @@
-PhoneGap Palm
+PhoneGap webOS
 =====================================================
-PhoneGap Palm is a skeleton Palm webOS application, along with javascript wrapper libraries, which allow a developer to build an application for a Palm webOS device using web technologies. This same code can be built for iPhone, BlackBerry, Symbian, and more to come ...
+PhoneGap webOS is a skeleton Palm webOS application, along with javascript wrapper libraries, which allow a developer to build an application for a Palm webOS device using web technologies. This same code can be built for iPhone, BlackBerry, Symbian, and more to come ...
 
 Pre-requisites
 -----------------------------------------------------
@@ -9,7 +9,7 @@ You should have VirtualBox (virtual machine software which runs the Palm emulato
 
 Set up your environment and install the skeleton app
 -----------------------------------------------------
-Open a terminal, and navigate to the root PhoneGap Palm folder (where this readme.md file is located). A Makefile resides here; running make here will package your application, and install it to either the emulator, or the device. Or you can run make on individual target tasks:
+Open a terminal, and navigate to the root PhoneGap webOS folder (where this readme.md file is located). A Makefile resides here; running make here will package your application, and install it to either the emulator, or the device. Or you can run make on individual target tasks:
 
    - make js - builds phonegap.js from source javascript files to libs/phonegap.js
    - make copy_js - copies libs/phonegap.js to framework/phonegap.js - modify this path if you want phonegap.js in another location
@@ -30,7 +30,7 @@ Also, your index.html must indicate when the device is ready to run the WebOS ap
 <script>
 	var phonegap = new PhoneGap();
 	phonegap.deviceReady();
-</script> 
+</script>  
 
 To enable a javascript debug console, open a new terminal window and type: phonegap-log app_id
 Where the app id is your app id as set in appinfo.json.
