@@ -1,6 +1,6 @@
 PhoneGap webOS
 =====================================================
-PhoneGap webOS is a skeleton HP webOS application, along with javascript wrapper libraries, which allow a developer to build an application for a Palm webOS device using web technologies. This same code can be built for iPhone, BlackBerry, Symbian, and more to come ...
+PhoneGap webOS is a skeleton HP webOS application, along with JavaScript wrapper libraries, which allow a developer to build an application for an HP webOS device using web technologies. This same code can be built for iPhone, BlackBerry, Symbian, and more to come ...
 
 Pre-requisites
 -----------------------------------------------------
@@ -29,7 +29,7 @@ Also, your index.html must indicate when the device is ready to run the WebOS ap
 <script>
 	var phonegap = new PhoneGap();
 	phonegap.deviceReady();
-</script> 
+</script>  
 
 To enable a javascript debug console, open a new terminal window and type: phonegap-log app_id
 Where the app id is your app id as set in appinfo.json.
