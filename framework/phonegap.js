@@ -1289,6 +1289,7 @@ if (typeof navigator.sms == "undefined") navigator.sms = new Sms();
  * @author ryan
  */
 
+/*
 function Storage() {
     this.length = null;
     this.available = true;
@@ -1379,9 +1380,10 @@ Storage.prototype.serialize = function() {
         message: err
     };
 
-};
+};   
+*/
 
-if (typeof navigator.storage == "undefined") navigator.storage = new Storage();
+//if (typeof navigator.storage == "undefined") navigator.storage = new Storage();
 
 /*
  * This class provides access to the telephony features of the device.
