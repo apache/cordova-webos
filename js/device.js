@@ -36,6 +36,14 @@ Device.prototype.deviceReady = function() {
 		setTimeout(function() { PalmSystem.stageReady(); PalmSystem.activate(); }, 1);
 		alert = this.showBanner;
 	}
+
+    // fire deviceready event; taken straight from phonegap-iphone
+    // put on a different stack so it always fires after DOMContentLoaded
+    window.setTimeout(function () {
+        var e = document.createEvent('Events');
+        e.initEvent('deviceready');
+        document.dispatchEvent(e);
+    }, 10);
 	
 	this.setUUID();
 };

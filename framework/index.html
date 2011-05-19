@@ -81,6 +81,10 @@
 </div>
 
 <script>                         
+document.addEventListener('deviceready', function () {
+    // PhoneGap is ready, do all your stuf here
+}, false);
+
 function createDB() {  
 	document.getElementById('storageResults').innerHTML = '';
 	db = window.openDatabase("test", "1.0", "Test DB", false);
