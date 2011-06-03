@@ -8,6 +8,7 @@ function Device() {
     this.version  = null;
     this.name     = null;
     this.uuid     = null;
+    this.deviceInfo = null;
 };
 
 /*
@@ -16,7 +17,7 @@ function Device() {
  *		var deviceinfo = JSON.stringify(navigator.device.getDeviceInfo()).replace(/,/g, ', ');
  */
 Device.prototype.getDeviceInfo = function() {
-	return JSON.parse(PalmSystem.deviceInfo);
+	return this.deviceInfo;//JSON.parse(PalmSystem.deviceInfo);
 };
 
 /*
@@ -46,6 +47,15 @@ Device.prototype.deviceReady = function() {
     }, 10);
 	
 	this.setUUID();
+	this.setDeviceInfo();
+};
+
+Device.prototype.setDeviceInfo = function() {
+    var parsedData = JSON.parse(PalmSystem.deviceInfo);
+    
+    this.deviceInfo = parsedData;
+    this.version = parsedData.platformVersion;
+    this.name = parsedData.modelName;
 };
 
 Device.prototype.setUUID = function() {
