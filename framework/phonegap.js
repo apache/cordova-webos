@@ -4,8 +4,57 @@ if (typeof(DeviceInfo) != 'object')
 function PhoneGap() {
 	ready = true;
 	available = true;
-	sceneController = null;
-};
+	sceneController = null;	
+}; 
+
+PhoneGap.exec = function(win, fail, clazz, action, args) {
+
+ setTimeout(function() { 
+	 PhoneGap.plugins[clazz].execute(action, args, win, fail); 
+   }, 0);
+
+}
+
+// translates the action into an API call
+notifications = {
+ execute: function(action, args, win, fail) {
+		var actionFound = false;
+		switch(action) {
+			case 'alert':
+				navigator.notification.alert(args);
+				actionFound = true; 
+				break;
+			case 'showBanner':
+				navigator.notification.showBanner(args);
+				actionFound = true;
+				break;
+			case 'newDashboard':
+			    navigator.notification.newDashboard();
+			    break;
+			case 'removeBannerMessage':
+			    navigator.notification.removeBannerMessage();
+			    break;
+			case 'clearBannerMessage':
+			    navigator.notification.clearBannerMessage();
+			    break;
+			case 'vibrate':            
+			    navigator.notification.vibrate();
+			    break;
+			case 'beep':               
+			    navigator.notification.beep();
+			    break;   		
+		}
+
+		if (actionFound)
+			win(args);
+		else
+			fail('action not found');
+   }
+}
+
+// this mapping acts as a shim to the webOS APIs
+PhoneGap.plugins = {};
+PhoneGap.plugins['navigator.notification'] = notifications;
 
 document.addEventListener('DOMContentLoaded', function () {
     window.phonegap = new PhoneGap();
@@ -424,6 +473,7 @@ function Device() {
     this.version  = null;
     this.name     = null;
     this.uuid     = null;
+    this.deviceInfo = null;
 };
 
 /*
@@ -432,7 +482,7 @@ function Device() {
  *		var deviceinfo = JSON.stringify(navigator.device.getDeviceInfo()).replace(/,/g, ', ');
  */
 Device.prototype.getDeviceInfo = function() {
-	return JSON.parse(PalmSystem.deviceInfo);
+	return this.deviceInfo;//JSON.parse(PalmSystem.deviceInfo);
 };
 
 /*
@@ -462,6 +512,15 @@ Device.prototype.deviceReady = function() {
     }, 10);
 	
 	this.setUUID();
+	this.setDeviceInfo();
+};
+
+Device.prototype.setDeviceInfo = function() {
+    var parsedData = JSON.parse(PalmSystem.deviceInfo);
+    
+    this.deviceInfo = parsedData;
+    this.version = parsedData.platformVersion;
+    this.name = parsedData.modelName;
 };
 
 Device.prototype.setUUID = function() {
@@ -1393,4 +1452,83 @@ function WindowProperties() {
     fastAccelerometer = false;
 };
 
-if (typeof navigator.windowProperties == 'undefined') navigator.windowProperties = new WindowProperties();
+if (typeof navigator.windowProperties == 'undefined') navigator.windowProperties = new WindowProperties();(function(window) {
+
+    /**
+     * Do not use thumbs.js on touch-enabled devices
+     * 
+     * Thanks to Jesse MacFadyen (purplecabbage):
+     * https://gist.github.com/850593#gistcomment-22484
+     */
+    try {
+        document.createEvent('TouchEvent');
+        return;
+    }
+    catch(e) {
+    }
+
+    /**
+     * Map touch events to mouse events
+     */
+    var eventMap = {
+        'mousedown': 'touchstart',
+        'mouseup':   'touchend',
+        'mousemove': 'touchmove'
+    };
+
+    /**
+     * Fire touch events
+     *
+     * Monitor mouse events and fire a touch event on the
+     * object broadcasting the mouse event. This approach
+     * likely has poorer performance than hijacking addEventListener
+     * but it is a little more browser friendly.
+     */
+    window.addEventListener('load', function() {
+        for (var key in eventMap) {
+            document.body.addEventListener(key, function(e) {
+                // Supports:
+                //   - addEventListener
+                //   - setAttribute
+                var event = createTouchEvent(eventMap[e.type], e);
+                e.target.dispatchEvent(event);
+
+                // Supports:
+                //   - element.ontouchstart
+                var fn = e.target['on' + eventMap[e.type]];
+                if (typeof fn === 'function') fn(e);
+            }, false);
+        }
+    }, false);
+
+    /**
+     * Utility function to create a touch event.
+     *
+     * @param  name  {String} of the event
+     * @return event {Object}
+     */
+    var createTouchEvent = function(name, e) {
+        var event = document.createEvent('MouseEvents');
+
+        event.initMouseEvent(
+            name,
+            e.bubbles,
+            e.cancelable,
+            e.view,
+            e.detail,
+            e.screenX,
+            e.screenY,
+            e.clientX,
+            e.clientY,
+            e.ctrlKey,
+            e.altKey,
+            e.shiftKey,
+            e.metaKey,
+            e.button,
+            e.relatedTarget
+        );
+
+        return event;
+    };
+
+})(window);
