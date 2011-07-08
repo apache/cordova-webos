@@ -18,6 +18,7 @@ OPEN = open
 ECHO = echo
 ECHO_N = echo -n
 JAVA = java
+PGVERSION = 1.0.0
 
 NAME = `$(CAT) framework/appinfo.json | $(GREP) '"id"' | $(CUT) -d \" -f 4`
 VERSION = `$(CAT) framework/appinfo.json | $(GREP) '"version"' | $(CUT) -d \" -f 4`
@@ -41,7 +42,7 @@ run:
 	palm-launch $(NAME)
 	
 copy_js:
-	cp lib/phonegap.js framework/phonegap.js
+	cp lib/phonegap.js framework/phonegap-$(PGVERSION).js
 	
 js: lib/phonegap.js
 
