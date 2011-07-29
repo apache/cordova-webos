@@ -1,5 +1,4 @@
-Herm Wong (4):
-	added touch events
-	updated README.md
-	phonegap-webos issue # 7
-	add the thumbs.js lib to the repo
+Herm Wong (2):
+      add the thumbs.js lib to the repo
+      added version file & change log
+
