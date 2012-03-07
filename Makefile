@@ -56,6 +56,7 @@ lib/phonegap.js: js/phonegap-core.js js/acceleration.js js/accelerometer.js js/a
 	$(CAT) js/audio.js >> $@
 	$(CAT) js/camera.js >> $@
 	$(CAT) js/contacts.js >> $@
+	$(CAT) js/compass.js >> $@
 	$(CAT) js/debugconsole.js >> $@
 	$(CAT) js/device.js >> $@
 	$(CAT) js/file.js >> $@
