@@ -97,6 +97,64 @@ cameraAPI = {
     }
 }
 
+windowAPI = {
+    execute: function(action, args, win, fail) {
+   		var actionFound = false;
+   		switch(action) {
+   			case 'newCard':
+   			    PhoneGap.checkArgs(args, navigator.window.newCard);  				    
+   				actionFound = true; 
+   				break;
+   			case 'setFullScreen':
+   			  	PhoneGap.checkArgs(args, navigator.window.setFullScreen);
+   				actionFound = true; 
+   				break;
+   			case 'setWindowProperties':
+   			    PhoneGap.checkArgs(args, navigator.window.setWindowProperties);
+		        actionFound = true;
+		        break;   			
+   			case 'blockScreenTimeout':
+   			    PhoneGap.checkArgs(args, navigator.window.blockScreenTimeout);
+   			    actionFound = true;
+		        break;
+   			case 'setSubtleLightbar':
+   			    PhoneGap.checkArgs(args, navigator.window.setSubtleLightbar);
+   			    actionFound = true;
+   			    break;
+   				   			  	
+   		}
+
+   		PhoneGap.callback(actionFound, win, fail);
+      }    
+}
+
+// translates the action into an API call
+compassAPI = {
+    execute: function(action, args, win, fail) {
+        var actionFound = false;
+		switch(action) {
+			case 'getCurrentHeading':
+				PhoneGap.checkArgs(args, navigator.compass.getCurrentHeading);
+				actionFound = true;
+				break;	
+			case 'watchHeading':
+			    PhoneGap.checkArgs(args, navigator.compass.watchHeading);
+			    actionFound = true;
+			    break;
+			case 'clearWatch':
+			    PhoneGap.checkArgs(args, navigator.compass.clearWatch);
+			    actionFound = true;
+			    break;
+			case 'start':
+			    PhoneGap.checkArgs(args, navigator.compass.start);
+			    actionFound = true;
+			    break;      		
+		}
+
+        PhoneGap.callback(actionFound, win, fail);
+    }
+}
+
 debugAPI = {
     execute: function(action, args, win, fail) {
         var actionFound = false;
