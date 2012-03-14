@@ -395,6 +395,7 @@ PhoneGap.plugins = {};
 PhoneGap.plugins['navigator.accelerometer'] = accelerometerAPI;
 PhoneGap.plugins['navigator.application'] = applicationAPI;
 PhoneGap.plugins['navigator.camera'] = cameraAPI;
+PhoneGap.plugins['navigator.compass'] = compassAPI;
 PhoneGap.plugins['window.debug'] = debugAPI;
 PhoneGap.plugins['navigator.device'] = deviceAPI;
 PhoneGap.plugins['navigator.geolocation'] = geolocationAPI;
