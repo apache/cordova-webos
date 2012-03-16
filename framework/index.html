@@ -39,6 +39,7 @@
 	<a onclick="storage();">Storage Tests</a> 
 	<a onclick="callPhoneGapExec();menu(false);">PhoneGap Exec</a>
 	<a onclick="page('touchDemo');">Touch Events Examples</a>
+	<a onclick="page('compassDemo');">Compass API</a>
 	<a onclick="menu(false);">Done</a>
 </div>
 
@@ -96,10 +97,54 @@
 	<div id="storageResults"></div>
 </div>
 
+<div id="compassDemo" style="display: none;">
+    <p>Compass Demo</p>
+	<button id="btnGetCurrentHeading" onclick="displayCurrentHeading();">Get Current Heading</button>    
+    <p>Watch Heading</p>
+    <button id="btnStartCompassWatch" onclick="startCompassWatch();">Start Compass Watch</button>
+    <button id="btnStopCompassWatch" onclick="stopCompassWatch();">Stop Compass Watch</button>
+
+</div>
+
 <script>                         
 document.addEventListener('deviceready', function () {
     // PhoneGap is ready, do all your stuf here
 }, false);
+
+var watchId = null;
+
+function displayCurrentHeading() {
+    
+    function successful(response) {
+        navigator.notification.alert("last heading: " + response);
+    }
+    
+    var request = navigator.compass.getCurrentHeading(successful, {});
+    
+}
+
+function startCompassWatch() {
+    // set frequency of compass updates in milliseconds
+    var options = { frequency: 5000 };
+    
+    function onStartCompassSuccess(heading) {
+        navigator.notification.alert("Heading: " + heading);
+    }
+    
+    watchId = navigator.compass.watchHeading(onStartCompassSuccess, onCompassError, options);
+}
+
+function stopCompassWatch() {
+    if (watchId) {
+        navigator.compass.clearWatch(watchId);
+        watchId = null;
+    }
+}
+
+function onCompassError(compassError) {
+    navigator.notification.alert("Compass error: " + compassError.code);
+}
+
 
 // setup event listeners for touch events 
 document.querySelector('#btnTouchStart').addEventListener('touchstart', onTouchEvent, false);
