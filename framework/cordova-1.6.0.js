@@ -1,28 +1,29 @@
 if (typeof(DeviceInfo) != 'object')
     DeviceInfo = {};
 
-function PhoneGap() {
+function Cordova() {
 	ready = true;
 	available = true;
 	sceneController = null;	
 }; 
 
-PhoneGap.exec = function(win, fail, clazz, action, args) {
+
+Cordova.exec = function(win, fail, clazz, action, args) {
 
  setTimeout(function() { 
-	 PhoneGap.plugins[clazz].execute(action, args, win, fail); 
+	 Cordova.plugins[clazz].execute(action, args, win, fail); 
    }, 0);
 
 }
 
-PhoneGap.checkArgs = function(args, func) {
+Cordova.checkArgs = function(args, func) {
     if (typeof args == 'object')
         func.apply(null, args);
     else
         func(args);
 }
 
-PhoneGap.callback = function(success, win, fail) {
+Cordova.callback = function(success, win, fail) {
 	if (success)
 		win();
 	else
@@ -35,28 +36,28 @@ accelerometerAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'setFastAccelerometer':				
-				PhoneGap.checkArgs(args, navigator.accelerometer.setFastAccelerometer);    
+				Cordova.checkArgs(args, navigator.accelerometer.setFastAccelerometer);    
 				actionFound = true; 
 				break;
 			case 'getCurrentAcceleration':
-				PhoneGap.checkArgs(args, navigator.accelerometer.getCurrentAcceleration);
+				Cordova.checkArgs(args, navigator.accelerometer.getCurrentAcceleration);
 				actionFound = true;
 				break;	
 			case 'watchAcceleration':
-			    PhoneGap.checkArgs(args, navigator.accelerometer.watchAcceleration);
+			    Cordova.checkArgs(args, navigator.accelerometer.watchAcceleration);
 			    actionFound = true;
 			    break;
 			case 'clearWatch':
-			    PhoneGap.checkArgs(args, navigator.accelerometer.clearWatch);
+			    Cordova.checkArgs(args, navigator.accelerometer.clearWatch);
 			    actionFound = true;
 			    break;
 			case 'start':
-			    PhoneGap.checkArgs(args, navigator.accelerometer.start);
+			    Cordova.checkArgs(args, navigator.accelerometer.start);
 			    actionFound = true;
 			    break;      		
 		}
 
-        PhoneGap.callback(actionFound, win, fail);
+        Cordova.callback(actionFound, win, fail);
     }
 }
 
@@ -65,20 +66,20 @@ applicationAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'activate':				
-				PhoneGap.checkArgs(args, navigator.application.activate);    
+				Cordova.checkArgs(args, navigator.application.activate);    
 				actionFound = true; 
 				break;
 			case 'deactivate':
-				PhoneGap.checkArgs(args, navigator.application.deactivate);
+				Cordova.checkArgs(args, navigator.application.deactivate);
 				actionFound = true;
 				break;	
 			case 'getIdentifier':
-			    PhoneGap.checkArgs(args, navigator.application.getIdentifier);
+			    Cordova.checkArgs(args, navigator.application.getIdentifier);
 			    actionFound = true;
 			    break;      		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);       
+		Cordova.callback(actionFound, win, fail);       
     }
 }
 
@@ -88,12 +89,39 @@ cameraAPI = {
 		switch(action) {
 			case 'getPicture':
 				console.log("in here");
-				PhoneGap.checkArgs(args, navigator.camera.getPicture);    
+				Cordova.checkArgs(args, navigator.camera.getPicture);    
 				actionFound = true; 
 				break;      		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
+    }
+}
+
+// translates the action into an API call
+compassAPI = {
+    execute: function(action, args, win, fail) {
+        var actionFound = false;
+		switch(action) {
+			case 'getCurrentHeading':
+				Cordova.checkArgs(args, navigator.compass.getCurrentHeading);
+				actionFound = true;
+				break;	
+			case 'watchHeading':
+			    Cordova.checkArgs(args, navigator.compass.watchHeading);
+			    actionFound = true;
+			    break;
+			case 'clearWatch':
+			    Cordova.checkArgs(args, navigator.compass.clearWatch);
+			    actionFound = true;
+			    break;
+			case 'start':
+			    Cordova.checkArgs(args, navigator.compass.start);
+			    actionFound = true;
+			    break;      		
+		}
+
+        Cordova.callback(actionFound, win, fail);
     }
 }
 
@@ -102,20 +130,20 @@ debugAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'log':				
-				PhoneGap.checkArgs(args, window.debug.log);    
+				Cordova.checkArgs(args, window.debug.log);    
 				actionFound = true; 
 				break;
 		    case 'warn':
-			    PhoneGap.checkArgs(args, window.debug.warn);    
+			    Cordova.checkArgs(args, window.debug.warn);    
 			    actionFound = true; 
 			    break;		    
 		    case 'error':
-			    PhoneGap.checkArgs(args, window.debug.error);    
+			    Cordova.checkArgs(args, window.debug.error);    
 			    actionFound = true; 
 			    break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -124,12 +152,12 @@ deviceAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'getDeviceInfo':				
-				PhoneGap.checkArgs(args, navigator.device.getDeviceInfo);    
+				Cordova.checkArgs(args, navigator.device.getDeviceInfo);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -138,28 +166,28 @@ geolocationAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'getCurrentPosition':				
-				PhoneGap.checkArgs(args, navigator.geolocation.getCurrentPosition);    
+				Cordova.checkArgs(args, navigator.geolocation.getCurrentPosition);    
 				actionFound = true; 
 				break; 
 			case 'watchPosition':				
-				PhoneGap.checkArgs(args, navigator.geolocation.watchPosition);    
+				Cordova.checkArgs(args, navigator.geolocation.watchPosition);    
 				actionFound = true; 
 				break;
 			case 'clearWatch':
-			    PhoneGap.checkArgs(args, navigator.geolocation.clearWatch);    
+			    Cordova.checkArgs(args, navigator.geolocation.clearWatch);    
 			    actionFound = true; 
 			    break;
 			case 'start':
-			    PhoneGap.checkArgs(args, navigator.geolocation.start);    
+			    Cordova.checkArgs(args, navigator.geolocation.start);    
 			    actionFound = true; 
 			    break;
 			case 'stop':
-			    PhoneGap.checkArgs(args, navigator.geolocation.stop);    
+			    Cordova.checkArgs(args, navigator.geolocation.stop);    
 			    actionFound = true; 
 			    break;								   	          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -168,12 +196,12 @@ mapAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'show':				
-				PhoneGap.checkArgs(args, navigator.map.show);    
+				Cordova.checkArgs(args, navigator.map.show);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -182,12 +210,12 @@ mouseAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'simulateMouseClick':				
-				PhoneGap.checkArgs(args, navigator.mouse.simulateMouseClick);    
+				Cordova.checkArgs(args, navigator.mouse.simulateMouseClick);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 } 
 
@@ -196,12 +224,12 @@ networkAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'isReachable':				
-				PhoneGap.checkArgs(args, navigator.network.isReachable);    
+				Cordova.checkArgs(args, navigator.network.isReachable);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -210,36 +238,36 @@ notificationAPI = {
 		var actionFound = false;
 		switch(action) {
 			case 'alert':				
-				PhoneGap.checkArgs(args, navigator.notification.alert);    
+				Cordova.checkArgs(args, navigator.notification.alert);    
 				actionFound = true; 
 				break;
 			case 'showBanner':
-				PhoneGap.checkArgs(args, navigator.notification.showBanner);
+				Cordova.checkArgs(args, navigator.notification.showBanner);
 				actionFound = true;
 				break;	
 			case 'newDashboard':
-			    PhoneGap.checkArgs(args, navigator.notification.newDashboard);
+			    Cordova.checkArgs(args, navigator.notification.newDashboard);
 			    actionFound = true;
 			    break;
 			case 'removeBannerMessage':
-			    PhoneGap.checkArgs(args, navigator.notification.removeBannerMessage);
+			    Cordova.checkArgs(args, navigator.notification.removeBannerMessage);
 			    actionFound = true;
 			    break;
 			case 'clearBannerMessage':
-			    PhoneGap.checkArgs(args, navigator.notification.clearBannerMessage);
+			    Cordova.checkArgs(args, navigator.notification.clearBannerMessage);
 			    actionFound = true;
 			    break;
 			case 'vibrate':            
-			    PhoneGap.checkArgs(args, navigator.notification.vibrate);
+			    Cordova.checkArgs(args, navigator.notification.vibrate);
 			    actionFound = true;
 			    break;
 			case 'beep':               
-			    PhoneGap.checkArgs(args, navigator.notification.beep);
+			    Cordova.checkArgs(args, navigator.notification.beep);
 			    actionFound = true;
 			    break;       		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);
+		Cordova.callback(actionFound, win, fail);
    }
 }
 
@@ -248,28 +276,28 @@ orientationAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'setOrientation':				
-				PhoneGap.checkArgs(args, navigator.orientation.setOrientation);    
+				Cordova.checkArgs(args, navigator.orientation.setOrientation);    
 				actionFound = true; 
 				break;
 			case 'getOrientation':
-			    PhoneGap.checkArgs(args, navigator.orientation.getOrientation);    
+			    Cordova.checkArgs(args, navigator.orientation.getOrientation);    
 			    actionFound = true; 
 			    break;			    
 			case 'start':
-			    PhoneGap.checkArgs(args, navigator.orientation.start);    
+			    Cordova.checkArgs(args, navigator.orientation.start);    
 				actionFound = true; 
 				break;
 			case 'watchOrientation':
-			    PhoneGap.checkArgs(args, navigator.orientation.watchOrientation);    
+			    Cordova.checkArgs(args, navigator.orientation.watchOrientation);    
 				actionFound = true; 
 				break;
 			case 'clearWatch':
-                PhoneGap.checkArgs(args, navigator.orientation.clearWatch);    
+                Cordova.checkArgs(args, navigator.orientation.clearWatch);    
 			    actionFound = true; 
 			    break;
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -278,12 +306,12 @@ smsAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'send':				
-				PhoneGap.checkArgs(args, navigator.sms.send);    
+				Cordova.checkArgs(args, navigator.sms.send);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -292,12 +320,12 @@ telephonyAPI = {
         var actionFound = false;
 		switch(action) {
 			case 'send':				
-				PhoneGap.checkArgs(args, navigator.telephony.send);    
+				Cordova.checkArgs(args, navigator.telephony.send);    
 				actionFound = true; 
 				break;		          		
 		}
 
-		PhoneGap.callback(actionFound, win, fail);        
+		Cordova.callback(actionFound, win, fail);        
     }
 }
 
@@ -306,52 +334,52 @@ windowAPI = {
    		var actionFound = false;
    		switch(action) {
    			case 'newCard':
-   			    PhoneGap.checkArgs(args, navigator.window.newCard);  				    
+   			    Cordova.checkArgs(args, navigator.window.newCard);  				    
    				actionFound = true; 
    				break;
    			case 'setFullScreen':
-   			  	PhoneGap.checkArgs(args, navigator.window.setFullScreen);
+   			  	Cordova.checkArgs(args, navigator.window.setFullScreen);
    				actionFound = true; 
    				break;
    			case 'setWindowProperties':
-   			    PhoneGap.checkArgs(args, navigator.window.setWindowProperties);
+   			    Cordova.checkArgs(args, navigator.window.setWindowProperties);
 		        actionFound = true;
 		        break;   			
    			case 'blockScreenTimeout':
-   			    PhoneGap.checkArgs(args, navigator.window.blockScreenTimeout);
+   			    Cordova.checkArgs(args, navigator.window.blockScreenTimeout);
    			    actionFound = true;
 		        break;
    			case 'setSubtleLightbar':
-   			    PhoneGap.checkArgs(args, navigator.window.setSubtleLightbar);
+   			    Cordova.checkArgs(args, navigator.window.setSubtleLightbar);
    			    actionFound = true;
    			    break;
    				   			  	
    		}
 
-   		PhoneGap.callback(actionFound, win, fail);
+   		Cordova.callback(actionFound, win, fail);
       }    
 }
 
 // this mapping acts as a shim to the webOS APIs
-PhoneGap.plugins = {};
-PhoneGap.plugins['navigator.accelerometer'] = accelerometerAPI;
-PhoneGap.plugins['navigator.application'] = applicationAPI;
-PhoneGap.plugins['navigator.camera'] = cameraAPI;
-PhoneGap.plugins['window.debug'] = debugAPI;
-PhoneGap.plugins['navigator.device'] = deviceAPI;
-PhoneGap.plugins['navigator.geolocation'] = geolocationAPI;
-PhoneGap.plugins['navigator.map'] = mapAPI;
-PhoneGap.plugins['navigator.mouse'] = mouseAPI;
-PhoneGap.plugins['navigator.network'] = networkAPI; 
-PhoneGap.plugins['navigator.notification'] = notificationAPI;
-PhoneGap.plugins['navigator.orientation'] = orientationAPI; 
-PhoneGap.plugins['navigator.sms'] = smsAPI;
-PhoneGap.plugins['navigator.telephony'] = telephonyAPI;  
-PhoneGap.plugins['navigator.window'] = windowAPI;
-
+Cordova.plugins = {};
+Cordova.plugins['navigator.accelerometer'] = accelerometerAPI;
+Cordova.plugins['navigator.application'] = applicationAPI;
+Cordova.plugins['navigator.camera'] = cameraAPI;
+Cordova.plugins['navigator.compass'] = compassAPI;
+Cordova.plugins['window.debug'] = debugAPI;
+Cordova.plugins['navigator.device'] = deviceAPI;
+Cordova.plugins['navigator.geolocation'] = geolocationAPI;
+Cordova.plugins['navigator.map'] = mapAPI;
+Cordova.plugins['navigator.mouse'] = mouseAPI;
+Cordova.plugins['navigator.network'] = networkAPI; 
+Cordova.plugins['navigator.notification'] = notificationAPI;
+Cordova.plugins['navigator.orientation'] = orientationAPI; 
+Cordova.plugins['navigator.sms'] = smsAPI;
+Cordova.plugins['navigator.telephony'] = telephonyAPI;  
+Cordova.plugins['navigator.window'] = windowAPI;
 
 document.addEventListener('DOMContentLoaded', function () {
-    window.phonegap = new PhoneGap();
+    window.cordova = new Cordova();
     navigator.device.deviceReady();
 });
 /*
@@ -542,9 +570,9 @@ if (typeof navigator.application == "undefined") navigator.application = new App
  * @constructor
  */
 
-PhoneGap.overrideAudio = function() {
+Cordova.overrideAudio = function() {
 	
-	PhoneGap.MojoAudio = Audio;
+	Cordova.MojoAudio = Audio;
 	
 	Audio = function(src) {
 		this.src = src;							
@@ -565,7 +593,7 @@ PhoneGap.overrideAudio = function() {
 				this.paused = false;
 				this.playing = true;	
 				this.stopped = false;
-				this.audioPlayer = new PhoneGap.MojoAudio();
+				this.audioPlayer = new Cordova.MojoAudio();
 				var file = Mojo.appPath + this.src;
 				if (this.audioPlayer.palm) {
 					this.audioPlayer.mojo.audioClass = "media";
@@ -627,7 +655,7 @@ PhoneGap.overrideAudio = function() {
 
 }
 
-document.addEventListener("deviceready", PhoneGap.overrideAudio, false);
+document.addEventListener("deviceready", Cordova.overrideAudio, false);
 
 /*
  * This class provides access to the device camera.
@@ -709,13 +737,115 @@ function ContactsFilter(name) {
  */
 
 Contacts.prototype.find = function(filter, successCallback, errorCallback, options) {
-	errorCallback({ name: "ContactsError", message: "PhoneGap Palm contacts not implemented" });
+	errorCallback({ name: "ContactsError", message: "Cordova Palm contacts not implemented" });
 };
 
 Contacts.prototype.success_callback = function(contacts_iterator) {
 };
 
 if (typeof navigator.contacts == "undefined") navigator.contacts = new Contacts();
+/*
+ * This class provides access to device compass data.
+ * @constructor
+ */
+function Compass() {
+  /*
+	 * The last known heading.
+	 */
+	this.lastHeading = null;
+};
+
+/*
+ * Asynchronously aquires the current compass heading.
+ * @param {Function} successCallback The function to call when the compass
+ * data is available
+ * @param {Function} errorCallback The function to call when there is an error 
+ * getting the compass data.
+ * @param {CompassOptions} options The options for getting the compass data
+ * such as timeout.
+ */
+
+Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
+
+    var referenceTime = 0;
+    if (this.lastHeading)
+        referenceTime = this.lastHeading.timestamp;
+    else
+        this.start();
+ 
+    var timeout = 20000;
+    var interval = 500;
+    if (typeof(options) == 'object' && options.interval)
+        interval = options.interval;
+ 
+    if (typeof(successCallback) != 'function')
+        successCallback = function() {};
+    if (typeof(errorCallback) != 'function')
+        errorCallback = function() {};
+ 
+    var dis = this;
+    var delay = 0;
+    var timer = setInterval(function() {
+        delay += interval;
+ 
+		//if we have a new compass heading, call success and cancel the timer
+        if (typeof(dis.lastHeading) == 'object' && dis.lastHeading != null && dis.lastHeading.timestamp > referenceTime) {
+            successCallback(dis.lastHeading.magHeading);
+            clearInterval(timer);
+        } else if (delay >= timeout) { //else if timeout has occured then call error and cancel the timer
+            errorCallback();
+            clearInterval(timer);
+        }
+		//else the interval gets called again
+    }, interval);
+};
+
+
+/*
+ * Asynchronously aquires the compass heading repeatedly at a given interval.
+ * @param {Function} successCallback The function to call each time the acceleration
+ * data is available
+ * @param {Function} errorCallback The function to call when there is an error 
+ * getting the compass data.
+ * @param {CompassOptions} options The options for getting the compass data
+ * such as timeout.
+ */
+
+Compass.prototype.watchHeading = function(successCallback, errorCallback, options) {
+	this.getCurrentHeading(successCallback, errorCallback, options);
+	// TODO: add the interval id to a list so we can clear all watches
+ 	var frequency = (options != undefined)? options.frequency : 10000;
+	var that = this;
+	return setInterval(function() {
+		that.getCurrentHeading(successCallback, errorCallback, options);
+	}, frequency);
+};
+
+/*
+ * Clears the specified heading watch.
+ * @param {String} watchId The ID of the watch returned from #watchHeading.
+ */
+Compass.prototype.clearWatch = function(watchId) {
+	clearInterval(watchId);
+};
+
+/*
+ * Starts the native compass listener.
+ */
+
+Compass.prototype.start = function() {
+	var that = this;
+	//Mojo.Event.listen(document, "acceleration", function(event) {
+	document.addEventListener("compass", function(event) {
+		var heading={};
+    heading.trueHeading=event.trueHeading;
+    heading.magHeading=event.magHeading;
+    heading.timestamp = new Date().getTime();
+		that.lastHeading = heading;
+	});
+};
+
+if (typeof navigator.compass == "undefined") navigator.compass = new Compass();
 /*
  * This class provides access to the debugging console.
  * @constructor
