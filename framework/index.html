@@ -14,9 +14,9 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>PhoneGap WebOS</title>
+	<title>cordova WebOS</title>
 	
-	<script type="text/javascript" src="phonegap-1.0.0.js"></script>   
+	<script type="text/javascript" src="cordova-1.6.0.js"></script>   
 	<script type="text/javascript">
 		// create global var for sqlite database instance
 		var db;
@@ -37,7 +37,7 @@
 	<a onclick="navigator.window.newCard('dashboard.html'); menu(false);">Launch New Card</a>
 	<a onclick="getPicture();">Launch Camera</a>
 	<a onclick="storage();">Storage Tests</a> 
-	<a onclick="callPhoneGapExec();menu(false);">PhoneGap Exec</a>
+	<a onclick="callCordovaExec();menu(false);">cordova Exec</a>
 	<a onclick="page('touchDemo');">Touch Events Examples</a>
 	<a onclick="page('compassDemo');">Compass API</a>
 	<a onclick="menu(false);">Done</a>
@@ -108,7 +108,7 @@
 
 <script>                         
 document.addEventListener('deviceready', function () {
-    // PhoneGap is ready, do all your stuf here
+    // cordova is ready, do all your stuf here
 }, false);
 
 var watchId = null;
@@ -159,9 +159,12 @@ function onTouchEvent(event) {
 	navigator.notification.alert(event.type);
 }
 
-function callPhoneGapExec() {
+function callCordovaExec() {
+    
+    navigator.notification.alert(Cordova.ready);
+    
 	//win, fail, clazz, action, args
-	PhoneGap.exec(success, fail, 'navigator.notification', 'alert', 'testing exec'); 
+	Cordova.exec(success, fail, 'navigator.notification', 'alert', 'testing exec'); 
 	
 	function success(msg) {
 		console.log(msg + ' exec succeeded');
@@ -235,6 +238,7 @@ function net() {
 		
 		var r = JSON.stringify(states[response]);
 		netpage.innerHTML = r.replace(/,/g, ', ');
+		netpage.innerHTML += response.toString();
 	}
 	
 	var request = navigator.network.isReachable('palm://com.palm.connectionmanager', successful, {});
