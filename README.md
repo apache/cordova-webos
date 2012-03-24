@@ -4,7 +4,7 @@ Cordova webOS is a skeleton HP webOS application, along with JavaScript wrapper 
 
 Pre-requisites
 -----------------------------------------------------
-You should have VirtualBox (virtual machine software which runs the Palm emulator) and the webOS SDK installed. Both of these can be found at [Palm's Developer Site] https://developer.palm.com/content/resources/develop/sdk_pdk_download.html.
+You should have VirtualBox (virtual machine software which runs the Palm emulator) and the webOS SDK installed. Both of these can be found at [Palm's Developer Site](https://developer.palm.com/content/resources/develop/sdk_pdk_download.html).
 
 Set up your environment and install the skeleton app
 -----------------------------------------------------
