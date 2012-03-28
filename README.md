@@ -48,6 +48,5 @@ Notes & Caveats
 
 Helpful Links
 -----------------------------------------------------
-  - Cordova API Docs: 			[docs.phonegap.com](http://docs.phonegap.com)
-  - Cordova Wiki: 				[phonegap.pbworks.com](http://phonegap.pbworks.com)
+  - Cordova Wiki: 				[wiki.apache.org/cordova](http://wiki.apache.org/cordova/)
   - Palm webOS developer site: 	[developer.palm.com](http://developer.palm.com)
