@@ -78,7 +78,9 @@
     <p>navigator.network.isReachable</p>
     <button id="isReachable" onclick="isReachable();">isReachable</button>
     <p>navigator.network.connection</p>
-    <button id="isReachable" onclick="networkConnection();">connection</button>
+    <button id="connection" onclick="networkConnection();">connection</button>
+    <p>navigator.network.connection.type</p>
+    <button id="connectionType" onclick="networkConnectionType();">connection type</button>
     <div id="networkResult"></div>
     
 </div>
@@ -260,6 +262,29 @@ function networkConnection() {
     }
     
     var request = navigator.network.connection('palm://com.palm.connectionmanager', successful, {});
+}
+
+function networkConnectionType() {
+    var netpage = document.getElementById("networkResult");
+ 	netpage.innerHTML = "Requesting connection type...";
+
+     function successful(response) {
+         
+ 		var connection = {};
+            connection[0] = Connection.UNKNOWN;
+            connection[1] = Connection.ETHERNET;
+            connection[2] = Connection.WIFI;
+            connection[3] = Connection.CELL_2G;
+            connection[4] = Connection.CELL_3G;
+            connection[5] = Connection.CELL_4G;
+            connection[6] = Connection.NONE;
+         
+         	var r = JSON.stringify(connection[response]);
+         	netpage.innerHTML = "connection type: ";
+    		netpage.innerHTML += r.replace(/,/g, ', ');
+     }
+
+     var request = navigator.network.connection.type('palm://com.palm.connectionmanager', successful, {});    
 }
 
 function displayCurrentOrientation() {
