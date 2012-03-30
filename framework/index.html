@@ -31,7 +31,7 @@
 	<a onclick="page('screen');">Adjust Screen Settings</a>
 	<a onclick="page('notifications');">Notification Examples</a>
 	<a onclick="info();">Show Device Info</a>
-	<a onclick="net();">Show Network Info</a>		
+	<a onclick="page('net');">Show Network Info</a>		
 	<a onclick="window.debug.log('trace this');">Console Logging</a>
 	<a onclick="launchmap()">Launch Map App</a>
 	<a onclick="navigator.window.newCard('dashboard.html'); menu(false);">Launch New Card</a>
@@ -74,7 +74,14 @@
 
 <div id="info" style="display: none;"></div>
 
-<div id="net" style="display: none;"></div>
+<div id="net" style="display: none;">
+    <p>navigator.network.isReachable</p>
+    <button id="isReachable" onclick="isReachable();">isReachable</button>
+    <p>navigator.network.connection</p>
+    <button id="isReachable" onclick="networkConnection();">connection</button>
+    <div id="networkResult"></div>
+    
+</div>
 
 <div id="camera" style="display: none;"></div>
 
@@ -223,9 +230,8 @@ function storage() {
 	page('storage');
 }
 
-function net() {
-	page('net');
-	var netpage = lastpage;
+function isReachable() {
+	var netpage = document.getElementById("networkResult");
 	netpage.innerHTML = "Requesting network info...";
 	
 	function successful(response) {
@@ -242,6 +248,18 @@ function net() {
 	}
 	
 	var request = navigator.network.isReachable('palm://com.palm.connectionmanager', successful, {});
+}
+
+function networkConnection() {
+    
+    var netpage = document.getElementById("networkResult");
+	netpage.innerHTML = "Requesting connection info...";
+	
+    function successful(response) {
+        netpage.innerHTML = JSON.stringify(response);
+    }
+    
+    var request = navigator.network.connection('palm://com.palm.connectionmanager', successful, {});
 }
 
 function displayCurrentOrientation() {
