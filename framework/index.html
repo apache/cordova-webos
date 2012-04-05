@@ -112,6 +112,7 @@
     <p>Watch Heading</p>
     <button id="btnStartCompassWatch" onclick="startCompassWatch();">Start Compass Watch</button>
     <button id="btnStopCompassWatch" onclick="stopCompassWatch();">Stop Compass Watch</button>
+    <div id="compassResult"></div>
 
 </div>
 
@@ -125,7 +126,10 @@ var watchId = null;
 function displayCurrentHeading() {
     
     function successful(response) {
-        navigator.notification.alert("last heading: " + response);
+        //navigator.notification.alert("last heading: " + JSON.stringify(response));
+        var compassPage = document.getElementById("compassResult");
+        compassPage.innerHTML = "current heading: "
+        compassPage.innerHTML += JSON.stringify(response);
     }
     
     var request = navigator.compass.getCurrentHeading(successful, {});
@@ -151,7 +155,7 @@ function stopCompassWatch() {
 }
 
 function onCompassError(compassError) {
-    navigator.notification.alert("Compass error: " + compassError.code);
+    navigator.notification.alert("Compass error");// + compassError.code);
 }
 
 

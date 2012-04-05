@@ -752,7 +752,7 @@ function Compass() {
   /*
 	 * The last known heading.
 	 */
-	this.lastHeading = null;
+	this.lastHeading = null;//new CompassHeading;
 };
 
 /*
@@ -768,6 +768,8 @@ function Compass() {
 Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
 
     var referenceTime = 0;
+	var compassHeading = new CompassHeading();
+
     if (this.lastHeading)
         referenceTime = this.lastHeading.timestamp;
     else
@@ -790,7 +792,19 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
  
 		//if we have a new compass heading, call success and cancel the timer
         if (typeof(dis.lastHeading) == 'object' && dis.lastHeading != null && dis.lastHeading.timestamp > referenceTime) {
-            successCallback(dis.lastHeading.magHeading);
+
+			compassHeading.timestamp = new Date(referenceTime);
+			compassHeading.magneticHeading = dis.lastHeading.magHeading;
+			compassHeading.trueHeading = dis.lastHeading.trueHeading;
+			
+			if (dis.lastHeading.headingAccuracy === undefined)
+				compassHeading.headingAccuracy = 1;
+			else
+				compassHeading.headingAccuracy = dis.lastHeading.headingAccuracy;
+
+			successCallback(compassHeading);
+
+            //successCallback(dis.lastHeading.magHeading);
             clearInterval(timer);
         } else if (delay >= timeout) { //else if timeout has occured then call error and cancel the timer
             errorCallback();
@@ -844,6 +858,36 @@ Compass.prototype.start = function() {
 		that.lastHeading = heading;
 	});
 };
+
+function CompassHeading(mHeading, tHeading, accuracy, time) {
+	if (mHeading === undefined)
+		this.magneticHeading = null;
+	else
+		this.magneticHeading = mHeading;
+		
+	if (tHeading === undefined)
+		this.trueHeading = null;
+	else
+		this.trueHeading = tHeading;
+		
+	if (accuracy === undefined)	
+		this.headingAccuracy = null;
+	else
+		this.headingAccuracy = accuracy;
+		
+	if (time === undefined)	
+		this.timestamp = new Date();
+	else
+		this.timestamp = new Date(time);
+};
+
+function CompassError() {
+	this.code = null;
+	this.message = "";	
+};
+
+CompassError.COMPASS_INTERNAL_ERR = 0;
+CompassError.COMPASS_NOT_SUPPORTED = 20;
 
 if (typeof navigator.compass == "undefined") navigator.compass = new Compass();
 /*
@@ -1399,6 +1443,23 @@ Network.prototype.connection = function(hostName, successCallback, options) {
 	    onFailure: function() {}
 	});	
 };
+
+Network.prototype.connection.type = function(hostName, successCallback, options) {
+	navigator.network.isReachable(hostName,successCallback, options);
+};
+
+function Connection() {
+	this.code = null;
+	this.message = "";
+};
+
+Connection.UNKNOWN = 'unknown';
+Connection.ETHERNET = 'ethernet';
+Connection.WIFI = 'wifi';
+Connection.CELL_2G = '2g';
+Connection.CELL_3G = '3g';
+Connection.CELL_4G = '4g';
+Connection.NONE = 'none';
 
 /*
  * This class contains information about any NetworkStatus.

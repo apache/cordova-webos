@@ -46,7 +46,7 @@ copy_js:
 	
 js: lib/cordova.js
 
-lib/cordova.js: js/cordova-core.js js/acceleration.js js/accelerometer.js js/application.js js/audio.js js/camera.js js/contacts.js js/debugconsole.js js/device.js js/file.js js/geolocation.js js/map.js js/mojo.js js/mouse.js js/network.js js/notification.js js/orientation.js js/position.js js/service.js js/sms.js js/telephony.js js/window.js js/windowproperties.js lib/thumbs.0.5.2.js
+lib/cordova.js: js/cordova-core.js js/acceleration.js js/accelerometer.js js/application.js js/audio.js js/camera.js js/compass.js js/contacts.js js/debugconsole.js js/device.js js/file.js js/geolocation.js js/map.js js/mojo.js js/mouse.js js/network.js js/notification.js js/orientation.js js/position.js js/service.js js/sms.js js/telephony.js js/window.js js/windowproperties.js lib/thumbs.0.5.2.js
 	$(MKPATH) lib
 	$(RM_F) $@
 	$(CAT) js/cordova-core.js >> $@
