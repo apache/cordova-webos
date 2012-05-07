@@ -19,7 +19,6 @@ ECHO = echo
 ECHO_N = echo -n
 JAVA = java
 PGVERSION = 1.7.0
-UNAME=$(SHELL uname)
 
 NAME = `$(CAT) framework/appinfo.json | $(GREP) '"id"' | $(CUT) -d \" -f 4`
 VERSION = `$(CAT) framework/appinfo.json | $(GREP) '"version"' | $(CUT) -d \" -f 4`
@@ -34,43 +33,24 @@ clean_libs:
 	-$(RM_RF) lib
 	
 package:
-ifeq ($(UNAME), Linux)
-    palm-package framework/
-else
-ifeq ($(UNAME), Darwin)
-# mac OSX
+ifeq ($(findstring palm-package.bat,$(wildcard *.bat)), )
 	palm-package framework/
 else
-# assume windows OS
-    palm-package.bat framework/
-endif
+	palm-package.bat framework/
 endif
 	
-
 deploy:
-ifeq ($(UNAME), Linux)
+ifeq ($(findstring palm-install.bat,$(wildcard *.bat)), )
 	palm-install $(NAME)_$(VERSION)_all.ipk
 else
-ifeq ($(UNAME), Darwin)
-# mac OSX
-    palm-install $(NAME)_$(VERSION)_all.ipk
-else
-# assume windows OS
-    palm-install.bat $(NAME)_$(VERSION)_all.ipk
-endif
+	palm-install.bat $(NAME)_$(VERSION)_all.ipk
 endif
 	
 run:
-ifeq ($(UNAME), Linux)
+ifeq ($(findstring palm-install.bat,$(wildcard *.bat)), )
 	palm-launch $(NAME)
 else
-ifeq ($(UNAME), Darwin)
-# mac OSX
-    palm-launch $(NAME)
-else
-# assume windows OS
-    palm-launch.bat $(NAME)
-endif
+	palm-launch.bat $(NAME)
 endif
 	
 copy_js:
