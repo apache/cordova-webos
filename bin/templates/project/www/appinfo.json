@@ -1,0 +1,10 @@
+{
+	"id": "io.cordova.hellocordova",
+	"version": "0.0.1",
+	"vendor": "Apache Cordova Team",
+	"type": "web",
+	"main": "index.html",
+	"title": "HelloCordova",
+	"icon": "img/logo.png",
+	"uiRevision":2
+}
