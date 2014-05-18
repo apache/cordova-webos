@@ -37,10 +37,10 @@ module.exports = function(cmd, args, stdio, opt_cwd) {
         }
         var child = child_process.spawn(cmd, args, {cwd: opt_cwd, stdio: stdio});
         child.on('exit', function(code) {
-            if (code===0) {
-                d.reject('Error code ' + code + ' for command: ' + cmd + ' with args: ' + args);
-            } else {
+            if(code===0) {
                 d.resolve();
+            } else {
+                d.reject('Error code ' + code + ' for command: ' + cmd + ' with args: ' + args);
             }
         });
     } catch(e) {
