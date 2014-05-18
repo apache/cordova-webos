@@ -32,16 +32,20 @@ function setShellFatal(value, func) {
 }
 
 function copyJs(projectPath) {
-    shell.cp('-f', path.join(ROOT, 'lib', 'cordova.js'), path.join(projectPath, 'www'));
+    shell.cp('-f', path.join(ROOT, 'cordova.js'), path.join(projectPath, 'www'));
 }
 
 function copyScripts(projectPath) {
-    var srcScriptsDir = path.join(ROOT, 'bin', 'templates', 'cordova');
+    var srcScriptsDir = path.join(ROOT, 'bin', 'templates', 'project', 'cordova');
     var destScriptsDir = path.join(projectPath, 'cordova');
     // Delete old scripts directory.
     shell.rm('-rf', destScriptsDir);
     // Copy in the new ones.
     shell.cp('-r', srcScriptsDir, projectPath);
+    shell.cp('-r', path.join(ROOT, 'bin', 'node_modules'), destScriptsDir);
+    shell.cp(path.join(ROOT, 'bin', 'check_reqs.bat'), path.join(destScriptsDir, 'check_reqs.bat'));
+    shell.cp(path.join(ROOT, 'bin', 'check_reqs'), path.join(destScriptsDir, 'check_reqs'));
+    shell.cp(path.join(ROOT, 'bin', 'lib', 'check_reqs.js'), path.join(destScriptsDir, 'lib', 'check_reqs.js'));
     // Make sure they are executable.
     shell.find(destScriptsDir).forEach(function(entry) {
         shell.chmod(755, entry);

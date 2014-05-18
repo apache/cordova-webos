@@ -19,8 +19,41 @@ specific language governing permissions and limitations
 under the License.
 */
 
-//add methods as we determine what are the requirements
+var child_process = require("child_process"),
+    Q = require("q"),
+    ext = ((process.platform.indexOf("win")==0) ? "": ".sh");
 
+// Returns a promise.
+module.exports.check_ares_package = function() {
+    var d = Q.defer();
+    child_process.exec("ares-package" + ext + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-package" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+        else d.resolve();
+    });
+    return d.promise;
+}
+
+// Returns a promise.
+module.exports.check_ares_install = function() {
+    var d = Q.defer();
+    child_process.exec("ares-install" + ext + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-install" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+        else d.resolve();
+    });
+    return d.promise;
+}
+
+// Returns a promise.
+module.exports.check_ares_launch = function() {
+    var d = Q.defer();
+    child_process.exec("ares-launch" + ext + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-launch" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+        else d.resolve();
+    });
+    return d.promise;
+}
+
+// Returns a promise.
 module.exports.run = function() {
-    return true;
+    return Q.all([this.check_ares_package(), this.check_ares_install(), this.check_ares_launch()]);
 }

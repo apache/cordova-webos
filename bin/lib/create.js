@@ -41,28 +41,36 @@ exports.createProject = function(project_path,package_name,project_name){
     }
     
     // Check that requirements are met and proper targets are installed
-    if(!check_reqs.run()) {
-        console.error('Please make sure you meeet the software requirements in order to build a webos cordova project');
-        process.exit(2);
-    }
-    
-    console.log('Creating webOS project');
-    console.log('Project Path '+ path.relative(process.cwd(),project_path));
-    console.log('Package Name '+ package_name);
-    console.log('Project Name '+ project_name);
+    check_reqs.run().done(
+        function success() {
+            console.log('Creating webOS project');
+            console.log('Project Path '+ path.relative(process.cwd(),project_path));
+            console.log('Package Name '+ package_name);
+            console.log('Project Name '+ project_name);
 
-    //copy template folder
-    shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'www'), project_path);
-    
-    //copy cordova js file
-    shjs.cp('-r', path.join(ROOT, 'lib', 'cordova.js'), path.join(project_path,'www'));  
+            //copy template folder
+            shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'www'), project_path);
+            
+            //copy cordova js file
+            shjs.cp(path.join(ROOT, 'cordova.js'), path.join(project_path,'www'));  
 
-    //copy cordova folder
-    shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'cordova'), project_path); 
-    [
-        'run',
-        'version',
-    ].forEach(function(f) { 
-         shjs.chmod(755, path.join(project_path, 'cordova', f));
-    });
+            //copy cordova folder
+            shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'cordova'), project_path);
+            shjs.cp('-r', path.join(ROOT, 'bin', 'node_modules'), path.join(project_path,'cordova'));
+
+            // copy check_reqs
+            shjs.cp(path.join(ROOT, 'bin', 'check_reqs.bat'), path.join(project_path, 'cordova', 'check_reqs.bat'));
+            shjs.cp(path.join(ROOT, 'bin', 'check_reqs'), path.join(project_path, 'cordova', 'check_reqs'));
+            shjs.cp(path.join(ROOT, 'bin', 'lib', 'check_reqs.js'), path.join(project_path, 'cordova', 'lib', 'check_reqs.js'));
+
+            // update permissions
+            shjs.find(path.join(project_path, 'cordova')).forEach(function(entry) {
+                shjs.chmod(755, entry);
+            });
+            console.log('Project successfully created.');
+        }, function fail(err) {
+            console.error('Please make sure you meet the software requirements in order to build a webOS Cordova project');
+            process.exit(2);
+        }
+    );
 }
