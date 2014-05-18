@@ -35,15 +35,12 @@ var path  = require("path"),
     var install_target;
 
     for (var i=2; i<args.length; i++) {
-        if (args[i] == "--debug" || args[i] == "--no-minify") {
+        if (args[i] == "--debug" || args[i] == "--no-minify" || args[i] == "--enyo-debug") {
             build_type = "--debug";
         } else if (args[i] == "--emulator") {
             install_target = "emulator";
         } else if (args[i].substring(0, 9) == "--target=") {
             install_target = args[i].substring(9, args[i].length);
-        } else {
-            console.error("ERROR : Run option \"" + args[i] + "\" not recognized.");
-            process.exit(2);
         }
     }
 
@@ -66,7 +63,7 @@ var path  = require("path"),
               }
         });
     });
-}
+};
 
 /*
  * Runs the application
@@ -78,7 +75,7 @@ module.exports.launch = function(appID) {
   };
   // close application if it's open, then launch
   return spawn("ares-launch", ["-c", appID], "ignore").then(doLaunch, doLaunch);
-}
+};
 
 module.exports.help = function() {
     console.log("Usage: " + path.relative(process.cwd(), path.join(ROOT, 'cordova', 'run')) + " [options]");
@@ -87,4 +84,4 @@ module.exports.help = function() {
     console.log("    --emulator : Will deploy the built project to an emulator if one exists");
     console.log("    --target=<target_id> : Installs to the target with the specified id.");
     process.exit(0);
-}
+};
