@@ -38,7 +38,8 @@ module.exports.run = function(build_type) {
         shell.mkdir("-p", binDir);
     }
     var args = ["-o", path.join(ROOT, "bin")];
-    if(build_type==="--debug" || build_type==="--no-minify") {
+    if(build_type==="--debug" || build_type==="--no-minify"
+            || build_type==="--enyo-debug") {
         args.push("-n");
     }
     args.push(path.join(ROOT, "www"));
