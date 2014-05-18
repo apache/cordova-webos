@@ -1,0 +1,5 @@
+* text=auto
+/bin/check_reqs text eol=lf
+/bin/create text eol=lf
+/bin/update text eol=lf
+
