@@ -19,7 +19,12 @@
        under the License.
 */
 
-// Coho updates this line:
-var VERSION = "3.7.0-dev";
+emulator = require('./lib/emulator');
 
-console.log(VERSION);
+console.log("Launching emulator...");
+
+emulator.start_emulator(function(err) {
+      if(err && err.message) {
+            console.error(err.message);
+      }
+})
