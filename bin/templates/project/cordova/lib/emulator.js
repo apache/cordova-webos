@@ -1,6 +1,8 @@
 var virtualbox = require('./virtualbox.js');
 var exec = require('child_process').exec;
 
+var timeout = {id:undefined};
+
 module.exports = {
 	is_running: function(callback) {
 		module.exports.active_emulator(function(vm) {
@@ -41,6 +43,29 @@ module.exports = {
 			checkVM();
 		});
 	},
+	wait_for_emulator: function(callback) {
+		var count = 0;
+		var TIMECAP = 20000;
+
+		var nextTimeout = function(funct) {
+			if(count>=TIMECAP) {
+				callback(new Error("Emulator connection timeout"));
+			} else {
+				count+= 2000;
+				setTimeout(funct, 2000);
+			}
+		};
+		var wait = function() {
+			module.exports.active_emulator(function(vm) {
+				if(vm) {
+					callback();
+				} else {
+					nextTimeout(wait);
+				}
+			});
+		}
+		setTimeout(wait, 5000);
+	},
 	webos_images: function(callback) {
 		virtualbox.list(function(availableVMs) {
 			var webOS_VMs = {};
@@ -77,7 +102,6 @@ module.exports = {
 				callback(err);
 			}
 			if(vm) {
-				console.log(webOS_VMs[vm]);
 				virtualbox.start(vm, true, emu_started);
 			} else {
 				module.exports.legacy_emulator(emu_started);
