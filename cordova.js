@@ -1,5 +1,5 @@
 // Platform: webos
-// 3.6.0-dev-f1219a4
+// 61d62b64daebdba529f2cc52ffb6e97df62fe46d
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -19,7 +19,7 @@
  under the License.
 */
 ;(function() {
-var CORDOVA_JS_BUILD_LABEL = '3.6.0-dev-f1219a4';
+var PLATFORM_VERSION_BUILD_LABEL = '3.7.0';
 // file: src/scripts/require.js
 
 /*jshint -W079 */
@@ -175,7 +175,8 @@ function createEvent(type, data) {
 var cordova = {
     define:define,
     require:require,
-    version:CORDOVA_JS_BUILD_LABEL,
+    version:PLATFORM_VERSION_BUILD_LABEL,
+    platformVersion:PLATFORM_VERSION_BUILD_LABEL,
     platformId:platform.id,
     /**
      * Methods to add/remove your own addEventListener hijacking on document + window.
@@ -262,11 +263,7 @@ var cordova = {
      * Called by native code when returning successful result from an action.
      */
     callbackSuccess: function(callbackId, args) {
-        try {
-            cordova.callbackFromNative(callbackId, true, args.status, [args.message], args.keepCallback);
-        } catch (e) {
-            console.log("Error in error callback: " + callbackId + " = "+e);
-        }
+        cordova.callbackFromNative(callbackId, true, args.status, [args.message], args.keepCallback);
     },
 
     /**
@@ -275,29 +272,33 @@ var cordova = {
     callbackError: function(callbackId, args) {
         // TODO: Deprecate callbackSuccess and callbackError in favour of callbackFromNative.
         // Derive success from status.
-        try {
-            cordova.callbackFromNative(callbackId, false, args.status, [args.message], args.keepCallback);
-        } catch (e) {
-            console.log("Error in error callback: " + callbackId + " = "+e);
-        }
+        cordova.callbackFromNative(callbackId, false, args.status, [args.message], args.keepCallback);
     },
 
     /**
      * Called by native code when returning the result from an action.
      */
-    callbackFromNative: function(callbackId, success, status, args, keepCallback) {
-        var callback = cordova.callbacks[callbackId];
-        if (callback) {
-            if (success && status == cordova.callbackStatus.OK) {
-                callback.success && callback.success.apply(null, args);
-            } else if (!success) {
-                callback.fail && callback.fail.apply(null, args);
-            }
+    callbackFromNative: function(callbackId, isSuccess, status, args, keepCallback) {
+        try {
+            var callback = cordova.callbacks[callbackId];
+            if (callback) {
+                if (isSuccess && status == cordova.callbackStatus.OK) {
+                    callback.success && callback.success.apply(null, args);
+                } else {
+                    callback.fail && callback.fail.apply(null, args);
+                }
 
-            // Clear callback if not expecting any more results
-            if (!keepCallback) {
-                delete cordova.callbacks[callbackId];
+                // Clear callback if not expecting any more results
+                if (!keepCallback) {
+                    delete cordova.callbacks[callbackId];
+                }
             }
+        }
+        catch (err) {
+            var msg = "Error in " + (isSuccess ? "Success" : "Error") + " callbackId: " + callbackId + " : " + err;
+            console && console.log && console.log(msg);
+            cordova.fireWindowEvent("cordovacallbackerror", { 'message': msg });
+            throw err;
         }
     },
     addConstructor: function(func) {
@@ -463,9 +464,14 @@ function each(objects, func, context) {
 
 function clobber(obj, key, value) {
     exports.replaceHookForTesting(obj, key);
-    obj[key] = value;
+    var needsProperty = false;
+    try {
+        obj[key] = value;
+    } catch (e) {
+        needsProperty = true;
+    }
     // Getters can only be overridden by getters.
-    if (obj[key] !== value) {
+    if (needsProperty || obj[key] !== value) {
         utils.defineGetter(obj, key, function() {
             return value;
         });
@@ -806,7 +812,6 @@ module.exports = channel;
 // file: src/webos/exec.js
 define("cordova/exec", function(require, exports, module) {
 
-var cordova = require('cordova');
 var execProxy = require('cordova/exec/proxy');
 
 module.exports = function(success, fail, service, action, args) {
@@ -862,6 +867,7 @@ var cordova = require('cordova');
 var modulemapper = require('cordova/modulemapper');
 var platform = require('cordova/platform');
 var pluginloader = require('cordova/pluginloader');
+var utils = require('cordova/utils');
 
 var platformInitChannelsArray = [channel.onNativeReady, channel.onPluginsReady];
 
@@ -893,11 +899,19 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
+            } 
+            else {
+                (function(k) {
+                    utils.defineGetterSetter(newNavigator,key,function() {
+                        return origNavigator[k];
+                    });
+                })(key);
             }
         }
     }
     return newNavigator;
 }
+
 if (window.navigator) {
     window.navigator = replaceNavigator(window.navigator);
 }
@@ -978,6 +992,7 @@ define("cordova/init_b", function(require, exports, module) {
 var channel = require('cordova/channel');
 var cordova = require('cordova');
 var platform = require('cordova/platform');
+var utils = require('cordova/utils');
 
 var platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady];
 
@@ -1012,6 +1027,13 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
+            } 
+            else {
+                (function(k) {
+                    utils.defineGetterSetter(newNavigator,key,function() {
+                        return origNavigator[k];
+                    });
+                })(key);
             }
         }
     }
@@ -1185,23 +1207,21 @@ module.exports = {
     id: 'webos',
     bootstrap: function() {
         var channel = require('cordova/channel');
-        var isLegacy = ((navigator.userAgent.indexOf("webOS")>-1) || (navigator.userAgent.indexOf("hpwOS")>-1));
-        var externalWebOSLib = (window.webOS!==undefined);
-        if(!externalWebOSLib && window.PalmSystem  && window.PalmSystem.stageReady && isLegacy) {
+        var isLegacy = /(?:web|hpw)OS\/(\d+)/.test(navigator.userAgent);
+        var webOSjsLib = (window.webOS!==undefined);
+        if(!webOSjsLib && window.PalmSystem && window.PalmSystem.stageReady && isLegacy) {
             window.PalmSystem.stageReady();
         }
         
-        // create global Mojo object if it does not exist
+        // create global legacy Mojo object if it does not exist
         window.Mojo = window.Mojo || {};
 
         // Check for support for page visibility api
         if(typeof document.webkitHidden !== "undefined") {
             document.addEventListener("webkitvisibilitychange", function(e) {
                 if(document.webkitHidden) {
-                    //cordova.fireDocumentEvent("pause");
                     channel.onPause.fire();
                 } else {
-                    //cordova.fireDocumentEvent("resume");
                     channel.onResume.fire();
                 }
             });
@@ -1216,7 +1236,7 @@ module.exports = {
             };
         }
 
-        if(isLegacy && !externalWebOSLib) {
+        if(isLegacy && !webOSjsLib) {
             var lp = JSON.parse(PalmSystem.launchParams || "{}") || {};
             window.cordova.fireDocumentEvent("webOSLaunch", {type:"webOSLaunch", detail:lp});
             // LunaSysMgr calls this whenever an app is "launched;"
@@ -1334,11 +1354,11 @@ function handlePluginsObject(path, moduleList, finishPluginLoading) {
 function findCordovaPath() {
     var path = null;
     var scripts = document.getElementsByTagName('script');
-    var term = 'cordova.js';
+    var term = '/cordova.js';
     for (var n = scripts.length-1; n>-1; n--) {
         var src = scripts[n].src.replace(/\?.*$/, ''); // Strip any query param (CB-6007).
         if (src.indexOf(term) == (src.length - term.length)) {
-            path = src.substring(0, src.length - term.length);
+            path = src.substring(0, src.length - term.length) + '/';
             break;
         }
     }
@@ -1553,7 +1573,7 @@ function UUIDcreatePart(length) {
 // file: src/webos/webos/service.js
 define("cordova/webos/service", function(require, exports, module) {
 
-var isLegacy = ((navigator.userAgent.indexOf("webOS")>-1) || (navigator.userAgent.indexOf("hpwOS")>-1));
+var isLegacy = /(?:web|hpw)OS\/(\d+)/.test(navigator.userAgent);
 
 function LS2Request(uri, params) {
     this.uri = uri;
@@ -1647,7 +1667,7 @@ module.exports = {
         var req = new LS2Request(uri, params);
         return req;
     },
-    systemPrefix: ((isLegacy) ? "com.palm" : "com.webos"),
+    systemPrefix: ((isLegacy) ? "com.palm." : "com.webos."),
     protocol: "luna://"
 };
 
