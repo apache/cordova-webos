@@ -44,9 +44,9 @@ exports.createProject = function(project_path,project_id,project_name){
     check_reqs.run().done(
         function success() {
             console.log('Creating webOS project');
-            console.log('Project Path '+ path.relative(process.cwd(),project_path));
-            console.log('Project ID '+ project_id);
-            console.log('Project Name '+ project_name);
+            console.log('Project Path: '+ path.relative(process.cwd(),project_path));
+            console.log('Project ID: '+ project_id);
+            console.log('Project Name: '+ project_name);
 
             //copy template folder
             shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'www'), project_path);
