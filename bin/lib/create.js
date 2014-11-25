@@ -26,12 +26,12 @@ var fs = require('fs'),
     ROOT    = path.join(__dirname, '..', '..'),
     check_reqs = require('./check_reqs');
 
-exports.createProject = function(project_path,package_name,project_name){
+exports.createProject = function(project_path,project_id,project_name){
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
     
     // Set default values for path, package and name
     project_path = typeof project_path !== 'undefined' ? project_path : "CordovaExample";
-    package_name = typeof package_name !== 'undefined' ? package_name : 'org.apache.cordova.example';
+    project_id = typeof project_id !== 'undefined' ? project_id : 'org.apache.cordova.example';
     project_name = typeof project_name !== 'undefined' ? project_name : 'CordovaExample';
 
     // Check if project already exists
@@ -45,11 +45,22 @@ exports.createProject = function(project_path,package_name,project_name){
         function success() {
             console.log('Creating webOS project');
             console.log('Project Path '+ path.relative(process.cwd(),project_path));
-            console.log('Package Name '+ package_name);
+            console.log('Project ID '+ project_id);
             console.log('Project Name '+ project_name);
 
             //copy template folder
             shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'www'), project_path);
+
+            // update appinfo.json
+            try {
+                var appInfoPath = path.join(project_path, 'www', 'appinfo.json');
+                var appInfo = JSON.parse(fs.readFileSync(appInfoPath, {encoding:"utf8"}));
+                appInfo.id = project_id;
+                appInfo.title = project_name;
+                fs.writeFileSync(appInfoPath, JSON.stringify(appInfo, null, "\t"));
+            } catch(e) {
+                console.warn('AppInfo initialization failed: ' + e);
+            }
             
             //copy cordova js file
             shjs.cp(path.join(ROOT, 'cordova.js'), path.join(project_path,'www'));  
