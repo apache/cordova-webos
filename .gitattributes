@@ -1,0 +1,8 @@
+* text=auto
+/bin/check_reqs text eol=lf
+/bin/create text eol=lf
+/bin/update text eol=lf
+/bin/templates/project/cordova/build text eol=lf
+/bin/templates/project/cordova/run text eol=lf
+/bin/templates/project/cordova/version text eol=lf
+/bin/templates/project/cordova/emulate text eol=lf
