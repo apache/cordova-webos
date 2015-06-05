@@ -53,6 +53,10 @@ function LS2Request(uri, params) {
 
 LS2Request.prototype.send = function() {
     if(!window.PalmServiceBridge) {
+        this.onFailure && this.onFailure({errorCode:-1,
+                errorText:"PalmServiceBridge not found.", returnValue: false});
+        this.onComplete && this.onComplete({errorCode:-1,
+                errorText:"PalmServiceBridge not found.", returnValue: false});
         console.error("PalmServiceBridge not found.");
         return;
     }
@@ -113,6 +117,6 @@ module.exports = {
         var req = new LS2Request(uri, params);
         return req;
     },
-    systemPrefix: ((isLegacy) ? "com.palm." : "com.webos."),
+    systemPrefix: "com.webos.",
     protocol: "luna://"
 };
