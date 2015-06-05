@@ -42,7 +42,7 @@ function copyScripts(projectPath) {
     shell.rm('-rf', destScriptsDir);
     // Copy in the new ones.
     shell.cp('-r', srcScriptsDir, projectPath);
-    shell.cp('-r', path.join(ROOT, 'bin', 'node_modules'), destScriptsDir);
+    shell.cp('-r', path.join(ROOT, 'node_modules'), destScriptsDir);
     shell.cp(path.join(ROOT, 'bin', 'check_reqs.bat'), path.join(destScriptsDir, 'check_reqs.bat'));
     shell.cp(path.join(ROOT, 'bin', 'check_reqs'), path.join(destScriptsDir, 'check_reqs'));
     shell.cp(path.join(ROOT, 'bin', 'lib', 'check_reqs.js'), path.join(destScriptsDir, 'lib', 'check_reqs.js'));
