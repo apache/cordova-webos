@@ -24,8 +24,7 @@ module.exports = {
     bootstrap: function() {
         var channel = require('cordova/channel');
         var isLegacy = /(?:web|hpw)OS\/(\d+)/.test(navigator.userAgent);
-        var webOSjsLib = (window.webOS!==undefined);
-        if(!webOSjsLib && window.PalmSystem && window.PalmSystem.stageReady && isLegacy) {
+        if(isLegacy && window.PalmSystem && window.PalmSystem.stageReady) {
             window.PalmSystem.stageReady();
         }
         
@@ -49,21 +48,6 @@ module.exports = {
             // LunaSysMgr calls this when the windows is minimized or closed.
             window.Mojo.stageDeactivated = function() {
                 channel.onPause.fire();
-            };
-        }
-
-        if(isLegacy && !webOSjsLib) {
-            var lp = JSON.parse(PalmSystem.launchParams || "{}") || {};
-            window.cordova.fireDocumentEvent("webOSLaunch", {type:"webOSLaunch", detail:lp});
-            // LunaSysMgr calls this whenever an app is "launched;"
-            window.Mojo.relaunch = function(e) {
-                var lp = JSON.parse(PalmSystem.launchParams || "{}") || {};
-                if(lp['palm-command'] && lp['palm-command'] == 'open-app-menu') {
-                    window.cordova.fireDocumentEvent("menubutton");
-                    return true;
-                } else {
-                    window.cordova.fireDocumentEvent("webOSRelaunch", {type:"webOSRelaunch", detail:lp});
-                }
             };
         }
         document.addEventListener("keydown", function(e) {
