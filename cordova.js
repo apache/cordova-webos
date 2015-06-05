@@ -1,5 +1,5 @@
 // Platform: webos
-// 61d62b64daebdba529f2cc52ffb6e97df62fe46d
+// 3b6d5a7edf901a0d45ec71e842f3075fa1b4eb8f
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -101,9 +101,14 @@ if (typeof module === "object" && typeof require === "function") {
 // file: src/cordova.js
 define("cordova", function(require, exports, module) {
 
+if(window.cordova){
+    throw new Error("cordova already defined");
+}
+
 
 var channel = require('cordova/channel');
 var platform = require('cordova/platform');
+
 
 /**
  * Intercept calls to addEventListener + removeEventListener and handle deviceready,
@@ -284,10 +289,16 @@ var cordova = {
             if (callback) {
                 if (isSuccess && status == cordova.callbackStatus.OK) {
                     callback.success && callback.success.apply(null, args);
-                } else {
+                } else if (!isSuccess) {
                     callback.fail && callback.fail.apply(null, args);
                 }
-
+                /*
+                else
+                    Note, this case is intentionally not caught.
+                    this can happen if isSuccess is true, but callbackStatus is NO_RESULT
+                    which is used to remove a callback from the list without calling the callbacks
+                    typically keepCallback is false in this case
+                */
                 // Clear callback if not expecting any more results
                 if (!keepCallback) {
                     delete cordova.callbacks[callbackId];
@@ -586,7 +597,6 @@ var utils = require('cordova/utils'),
  * onDeviceReady*              User event fired to indicate that Cordova is ready
  * onResume                    User event fired to indicate a start/resume lifecycle event
  * onPause                     User event fired to indicate a pause lifecycle event
- * onDestroy*                  Internal event fired when app is being destroyed (User should use window.onunload event, not this one).
  *
  * The events marked with an * are sticky. Once they have fired, they will stay in the fired state.
  * All listeners that subscribe after the event is fired will be executed right away.
@@ -798,9 +808,6 @@ channel.create('onResume');
 // Event to indicate a pause lifecycle event
 channel.create('onPause');
 
-// Event to indicate a destroy lifecycle event
-channel.createSticky('onDestroy');
-
 // Channels that must fire before "deviceready" is fired.
 channel.waitForInitialization('onCordovaReady');
 channel.waitForInitialization('onDOMContentLoaded');
@@ -809,7 +816,7 @@ module.exports = channel;
 
 });
 
-// file: src/webos/exec.js
+// file: node_modules/cordova-webos/cordova-js-src/exec.js
 define("cordova/exec", function(require, exports, module) {
 
 var execProxy = require('cordova/exec/proxy');
@@ -899,7 +906,7 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
-            } 
+            }
             else {
                 (function(k) {
                     utils.defineGetterSetter(newNavigator,key,function() {
@@ -1027,7 +1034,7 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
-            } 
+            }
             else {
                 (function(k) {
                     utils.defineGetterSetter(newNavigator,key,function() {
@@ -1082,7 +1089,7 @@ platform.bootstrap && platform.bootstrap();
  * Create all cordova objects once native side is ready.
  */
 channel.join(function() {
-    
+
     platform.initialize && platform.initialize();
 
     // Fire event to notify that all objects are created
@@ -1200,7 +1207,7 @@ exports.reset();
 
 });
 
-// file: src/webos/platform.js
+// file: node_modules/cordova-webos/cordova-js-src/platform.js
 define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
@@ -1208,8 +1215,7 @@ module.exports = {
     bootstrap: function() {
         var channel = require('cordova/channel');
         var isLegacy = /(?:web|hpw)OS\/(\d+)/.test(navigator.userAgent);
-        var webOSjsLib = (window.webOS!==undefined);
-        if(!webOSjsLib && window.PalmSystem && window.PalmSystem.stageReady && isLegacy) {
+        if(isLegacy && window.PalmSystem && window.PalmSystem.stageReady) {
             window.PalmSystem.stageReady();
         }
         
@@ -1233,21 +1239,6 @@ module.exports = {
             // LunaSysMgr calls this when the windows is minimized or closed.
             window.Mojo.stageDeactivated = function() {
                 channel.onPause.fire();
-            };
-        }
-
-        if(isLegacy && !webOSjsLib) {
-            var lp = JSON.parse(PalmSystem.launchParams || "{}") || {};
-            window.cordova.fireDocumentEvent("webOSLaunch", {type:"webOSLaunch", detail:lp});
-            // LunaSysMgr calls this whenever an app is "launched;"
-            window.Mojo.relaunch = function(e) {
-                var lp = JSON.parse(PalmSystem.launchParams || "{}") || {};
-                if(lp['palm-command'] && lp['palm-command'] == 'open-app-menu') {
-                    window.cordova.fireDocumentEvent("menubutton");
-                    return true;
-                } else {
-                    window.cordova.fireDocumentEvent("webOSRelaunch", {type:"webOSRelaunch", detail:lp});
-                }
             };
         }
         document.addEventListener("keydown", function(e) {
@@ -1570,7 +1561,7 @@ function UUIDcreatePart(length) {
 
 });
 
-// file: src/webos/webos/service.js
+// file: node_modules/cordova-webos/cordova-js-src/webos/service.js
 define("cordova/webos/service", function(require, exports, module) {
 
 var isLegacy = /(?:web|hpw)OS\/(\d+)/.test(navigator.userAgent);
@@ -1607,6 +1598,10 @@ function LS2Request(uri, params) {
 
 LS2Request.prototype.send = function() {
     if(!window.PalmServiceBridge) {
+        this.onFailure && this.onFailure({errorCode:-1,
+                errorText:"PalmServiceBridge not found.", returnValue: false});
+        this.onComplete && this.onComplete({errorCode:-1,
+                errorText:"PalmServiceBridge not found.", returnValue: false});
         console.error("PalmServiceBridge not found.");
         return;
     }
@@ -1667,7 +1662,7 @@ module.exports = {
         var req = new LS2Request(uri, params);
         return req;
     },
-    systemPrefix: ((isLegacy) ? "com.palm." : "com.webos."),
+    systemPrefix: "com.webos.",
     protocol: "luna://"
 };
 
