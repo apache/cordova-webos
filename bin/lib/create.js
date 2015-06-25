@@ -65,6 +65,9 @@ exports.createProject = function(project_path,project_id,project_name){
             //copy cordova js file
             shjs.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'), path.join(project_path,'www'));  
 
+            //copy cordova-js-src directory
+            shjs.cp('-rf', path.join(ROOT, 'cordova-js-src'), path.join('project_path', 'platform_www'));
+
             //copy cordova folder
             shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'cordova'), project_path);
             shjs.cp('-r', path.join(ROOT, 'node_modules'), path.join(project_path,'cordova'));
