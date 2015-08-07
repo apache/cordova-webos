@@ -32,9 +32,8 @@ module.exports = function(cmd, args, stdio, opt_cwd) {
         if (isWindows) {
             args.unshift('/s', '/c', cmd);
             cmd = 'cmd';
-        } else {
-            cmd += ".sh";
         }
+
         var child = child_process.spawn(cmd, args, {cwd: opt_cwd, stdio: stdio});
         child.on('exit', function(code) {
             if(code===0) {

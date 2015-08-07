@@ -20,14 +20,13 @@ under the License.
 */
 
 var child_process = require("child_process"),
-    Q = require("q"),
-    ext = ((process.platform.indexOf("win")==0) ? "": ".sh");
+    Q = require("q");
 
 // Returns a promise.
 module.exports.check_ares_package = function() {
     var d = Q.defer();
-    child_process.exec("ares-package" + ext + " -V", function(err, stdout, stderr) {
-        if (err) d.reject(new Error("ERROR : executing command \"ares-package" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+    child_process.exec("ares-package" + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-package" + "\", make sure you have ares-webos-sdk installed and added to your path."));
         else d.resolve();
     });
     return d.promise;
@@ -36,8 +35,8 @@ module.exports.check_ares_package = function() {
 // Returns a promise.
 module.exports.check_ares_install = function() {
     var d = Q.defer();
-    child_process.exec("ares-install" + ext + " -V", function(err, stdout, stderr) {
-        if (err) d.reject(new Error("ERROR : executing command \"ares-install" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+    child_process.exec("ares-install" + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-install" + "\", make sure you have ares-webos-sdk installed and added to your path."));
         else d.resolve();
     });
     return d.promise;
@@ -46,8 +45,8 @@ module.exports.check_ares_install = function() {
 // Returns a promise.
 module.exports.check_ares_launch = function() {
     var d = Q.defer();
-    child_process.exec("ares-launch" + ext + " -V", function(err, stdout, stderr) {
-        if (err) d.reject(new Error("ERROR : executing command \"ares-launch" + ext + "\", make sure you have ares-webos-sdk installed and added to your path."));
+    child_process.exec("ares-launch" + " -V", function(err, stdout, stderr) {
+        if (err) d.reject(new Error("ERROR : executing command \"ares-launch" + "\", make sure you have ares-webos-sdk installed and added to your path."));
         else d.resolve();
     });
     return d.promise;
