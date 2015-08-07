@@ -22,6 +22,7 @@
 
 ### 3.7.0 ###
 
+* Fixed issues with project creation and when using with OS X
 * CB-8965 Copy cordova-js-src directory to platform folder during create. This closes #4
 * made version consistant and added node_modules to git
 * Relocated built cordova.js to the more common cordova-lib directory for easier organization
