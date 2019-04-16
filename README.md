@@ -20,6 +20,17 @@
 -->
 Cordova webOS
 =====================================================
+
+---
+📌 **Deprecation Notice**
+
+This repository is deprecated and no more work will be done on this by Apache Cordova. You can continue to use this and it should work as-is but any future issues will not be fixed by the Cordova community.
+
+Feel free to fork this repository and improve your fork. Existing forks are listed in [Network](../../network) and [Forks](../../network/members).
+
+- Learn more: https://github.com/apache/cordova/blob/master/deprecated.md#deprecated-platforms
+---
+
 Cordova webOS is a skeleton webOS application, along with JavaScript wrapper libraries, which allow a developer to build an application for an LG webOS device using web technologies. This same code can be built for iPhone, BlackBerry, Symbian, and more to come ...
 
 
